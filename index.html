@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RailPulse • Gestão de Arrecadação • ViaMobilidade Linhas 8 & 9</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js & SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- Three.js (3D Graphics) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header-container">
+    <div class="brand-section">
+      <div class="train-badge-logo">
+        <span class="material-symbols-outlined" style="color: #38bdf8; font-size: 26px;">train</span>
+      </div>
+      <div>
+        <h1 class="brand-title">RailPulse</h1>
+        <div class="brand-subtitle">Gestão de Arrecadação • ViaMobilidade Linhas 8 &amp; 9</div>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Status Indicators (Gestão de Arrecadação) -->
+    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+      <div class="fleet-indicator-chip chip-l8" title="Frota em operação na Linha 8 Diamante">
+        <span class="beacon-dot beacon-cyan"></span>
+        <span>L8 Diamante:</span>
+        <span class="fleet-count">38 trens</span>
+      </div>
+      <div class="fleet-indicator-chip chip-l9" title="Frota em operação na Linha 9 Esmeralda">
+        <span class="beacon-dot beacon-emerald"></span>
+        <span>L9 Esmeralda:</span>
+        <span class="fleet-count">34 trens</span>
+      </div>
+      <div class="fleet-indicator-chip" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1);" title="Status da Base de Dados Carregada">
+        <span class="beacon-dot beacon-emerald"></span>
+        <span style="color: #34d399; font-weight: 600;">Base MD.xlsx: 1.678 dias</span>
+      </div>
+      <div class="live-clock-badge" title="Relógio do Sistema • Gestão de Arrecadação">
+        <span class="material-symbols-outlined" style="font-size: 14px; color: #38bdf8;">schedule</span>
+        <span id="cco-live-clock">--:--:-- BRT</span>
+      </div>
+      <script>
+        (function() {
+          function tick() {
+            var el = document.getElementById('cco-live-clock');
+            if (el) {
+              var now = new Date();
+              el.innerText = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' BRT';
+            }
+          }
+          tick();
+          setInterval(tick, 1000);
+        })();
+      </script>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <input type="file" id="xlsx-upload-input" accept=".xlsx,.xls" style="display: none;">
+      <button class="btn-action" onclick="document.getElementById('xlsx-upload-input').click()">
+        <span class="material-symbols-outlined" style="font-size: 16px; color: #38bdf8;">upload_file</span>
+        Subir Novo XLSX
+      </button>
+      <button class="btn-action btn-primary" onclick="window.print()">
+        <span class="material-symbols-outlined" style="font-size: 16px;">picture_as_pdf</span>
+        Exportar Relatório
+      </button>
+    </div>
+  </header>
+
+  <!-- App Shell: Full Width Main Viewport (Sidebar removida) -->
+  <div class="app-shell full-width">
+    
+    <!-- Main Viewport -->
+    <div class="main-viewport full-width">
+
+  <!-- App Main Content Container -->
+  <main class="app-container">
+
+    <!-- ======================================================== -->
+    <!-- ESTAÇÃO FERROVIÁRIA INTERATIVA: TRENS LINHAS 8 E 9 -->
+    <!-- Adaptado de menu_saas_viamobilidade_linhas_8_e_9.html -->
+    <!-- ======================================================== -->
+    <section class="railway-station" id="station-viamobilidade">
+      
+      <!-- Cabeçalho da Estação com Controles Rápidos -->
+      <div class="railway-station-header">
+        <div class="station-title-group">
+          <div class="station-icon-badge">
+            <i data-lucide="train-front" style="width: 22px; height: 22px;"></i>
+          </div>
+          <div>
+            <div class="station-heading">
+              <span>Gestão de Arrecadação • ViaMobilidade Linhas 8 e 9</span>
+              <span class="station-badge-sub">Plataforma Integrada v2.0</span>
+            </div>
+            <div class="station-desc">
+              Monitoramento de Arrecadação, Fluxo de Passageiros, Semáforos Dinâmicos, Pantógrafo com Faísca Elétrica e Letreiro LED Matrix.
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles de Manobra da Estação & Navegação de Abas -->
+        <div class="station-controls-bar">
+          <!-- Seletor de Abas Principal integrado -->
+          <button type="button" class="station-btn nav-tab-btn active" data-tab="overview" id="btn-tab-overview" title="Ir para Visão Geral e Médias de Arrecadação">
+            <i data-lucide="layout-dashboard" style="width: 14px; height: 14px; color: #38bdf8;"></i>
+            <span>1. Visão Geral &amp; 3D</span>
+          </button>
+          <button type="button" class="station-btn nav-tab-btn" data-tab="studio" id="btn-tab-studio" title="Ir para Análise Comparativa de Estações">
+            <i data-lucide="line-chart" style="width: 14px; height: 14px; color: #10b981;"></i>
+            <span>2. Análise</span>
+          </button>
+
+          <span style="width: 1px; height: 22px; background: rgba(255,255,255,0.15); margin: 0 0.2rem;"></span>
+
+          <button type="button" class="station-btn btn-l8" id="station-btn-l8" onclick="quickFilterLineScope('l8');" title="Manobrar Trem da Linha 8 (Diamante)">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #9E9E93; box-shadow: 0 0 6px #9E9E93;"></span>
+            <span>Linha 8 (Diamante)</span>
+          </button>
+          <button type="button" class="station-btn btn-l9" id="station-btn-l9" onclick="quickFilterLineScope('l9');" title="Manobrar Trem da Linha 9 (Esmeralda)">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #00A88F; box-shadow: 0 0 6px #00A88F;"></span>
+            <span>Linha 9 (Esmeralda)</span>
+          </button>
+          <button type="button" class="station-btn active" id="station-btn-both" onclick="quickFilterLineScope('both');" title="Comparar Ambas as Linhas no Gráfico">
+            <i data-lucide="git-merge" style="width: 14px; height: 14px; color: #a855f7;"></i>
+            <span>Ambas as Linhas</span>
+          </button>
+          <button type="button" class="station-btn" id="station-btn-close" onclick="closeAllTrains()" title="Recolher todas as composições para dentro do túnel">
+            <i data-lucide="rotate-ccw" style="width: 14px; height: 14px; color: #f43f5e;"></i>
+            <span>Recolher</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Status da Gestão de Arrecadação -->
+      <div class="station-status-strip">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; animation: pulseBeacon 1.8s infinite;"></span>
+          <span style="font-weight: 700; color: #e2e8f0; text-transform: uppercase; letter-spacing: 0.5px;">Gestão de Arrecadação:</span>
+          <span id="station-status" style="font-family: 'JetBrains Mono', monospace; color: #fbbf24; font-weight: 700;">
+            SINAL VERDE L8 • TREM DIAMANTE NA PLATAFORMA
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.7rem; color: #94a3b8;">
+          <i data-lucide="door-open" style="width: 14px; height: 14px; color: #fde047;"></i>
+          <span>Clique nos vagões para abrir as portas ou nas cabines para acionar a partida</span>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           TRILHO 1: LINHA 8 - DIAMANTE (#9E9E93)
+           ==================================================== -->
+      <div class="train-track-wrapper">
+        <div class="train-track active" id="track-l8">
+          
+          <!-- Rede Aérea (Catenária) -->
+          <div class="catenary-system">
+            <div class="catenary-wire"></div>
+          </div>
+
+          <!-- Boca do Túnel + Semáforo Ferroviário -->
+          <div class="tunnel-mouth" title="Túnel e Semáforo Linha 8 - Diamante">
+            <div class="railway-signal" title="Semáforo da Via L8">
+              <span class="signal-light red"></span>
+              <span class="signal-light green"></span>
+            </div>
+            <span class="line-badge l8-badge">8</span>
+          </div>
+
+          <!-- Composição Completa Linha 8 -->
+          <div class="train-composition line-8" onclick="toggleTrain('track-l8'); quickFilterLineScope('l8');">
+            
+            <!-- Vagões da Linha 8 com Portas Automáticas Corrediças -->
+            <div class="train-wagons">
+              <!-- Pantógrafo e Faísca Elétrica -->
+              <div class="pantograph-assembly">
+                <div class="pantograph-collector"></div>
+                <div class="pantograph-arm"></div>
+                <div class="pantograph-base"></div>
+                <div class="electric-spark"></div>
+              </div>
+
+              <!-- Vagão 1: Visão Geral / KPIs -->
+              <button type="button" class="wagon-item selected-menu" data-menu="overview" onclick="selectStationWagon(event, 'l8', 'overview')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="layout-dashboard" style="width: 14px; height: 14px;"></i>
+                  <span>Visão Geral</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 2: Gráfico de Médias & Diamante 3D -->
+              <button type="button" class="wagon-item" data-menu="media" onclick="selectStationWagon(event, 'l8', 'media')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="bar-chart-3" style="width: 14px; height: 14px;"></i>
+                  <span>Média &amp; 3D</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 3: Análise & Comparador de Estações -->
+              <button type="button" class="wagon-item" data-menu="studio" onclick="selectStationWagon(event, 'l8', 'studio')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="sliders-horizontal" style="width: 14px; height: 14px;"></i>
+                  <span>Análise L8</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 4: Exportar Dados da L8 -->
+              <button type="button" class="wagon-item" data-menu="export" onclick="selectStationWagon(event, 'l8', 'export')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                  <span>Baixar Excel</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+            </div>
+
+            <!-- Cabine Frontal da Linha 8 com Letreiro LED Matrix -->
+            <div class="train-cabin" title="Clique para manobrar o trem da Linha 8 - Diamante">
+              <div class="cabin-stripe"></div>
+              <div class="cabin-top-row">
+                <div class="led-matrix-housing" title="Letreiro Digital de Destino">
+                  <span id="led-text-l8" class="led-matrix-text">L8 • DESTINO: DIAMANTE • J.PRESTES</span>
+                </div>
+                <div class="windshield"></div>
+              </div>
+              <div class="cabin-bottom-row">
+                <span class="cabin-label">
+                  <span class="cabin-status-dot"></span>
+                  Diamante
+                </span>
+              </div>
+              <div class="headlights"></div>
+            </div>
+
+          </div>
+
+          <!-- Dica visual no trilho quando fechado -->
+          <div class="track-hint">
+            <i data-lucide="mouse-pointer-click" style="width: 14px; height: 14px; color: #94a3b8;"></i>
+            <span>Sinal Vermelho • Clique na cabine da <strong>Linha 8 (Diamante)</strong> para liberar partida</span>
+          </div>
+
+          <!-- Para-choque de limite de via e Dormentes -->
+          <div class="buffer-stop" title="Para-choque de Fim de Via"></div>
+          <div class="railway-bed"></div>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           TRILHO 2: LINHA 9 - ESMERALDA (#00A88F)
+           ==================================================== -->
+      <div class="train-track-wrapper">
+        <div class="train-track" id="track-l9">
+          
+          <!-- Rede Aérea (Catenária) -->
+          <div class="catenary-system">
+            <div class="catenary-wire"></div>
+          </div>
+
+          <!-- Boca do Túnel + Semáforo Ferroviário -->
+          <div class="tunnel-mouth" title="Túnel e Semáforo Linha 9 - Esmeralda">
+            <div class="railway-signal" title="Semáforo da Via L9">
+              <span class="signal-light red"></span>
+              <span class="signal-light green"></span>
+            </div>
+            <span class="line-badge l9-badge">9</span>
+          </div>
+
+          <!-- Composição Completa Linha 9 -->
+          <div class="train-composition line-9" onclick="toggleTrain('track-l9'); quickFilterLineScope('l9');">
+            
+            <!-- Vagões da Linha 9 com Portas Automáticas Corrediças -->
+            <div class="train-wagons">
+              <!-- Pantógrafo e Faísca Elétrica -->
+              <div class="pantograph-assembly">
+                <div class="pantograph-collector"></div>
+                <div class="pantograph-arm"></div>
+                <div class="pantograph-base"></div>
+                <div class="electric-spark"></div>
+              </div>
+
+              <!-- Vagão 1: Visão Geral / KPIs -->
+              <button type="button" class="wagon-item" data-menu="overview" onclick="selectStationWagon(event, 'l9', 'overview')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="layout-dashboard" style="width: 14px; height: 14px;"></i>
+                  <span>Visão Geral</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 2: Gráfico de Médias da Linha 9 -->
+              <button type="button" class="wagon-item" data-menu="media" onclick="selectStationWagon(event, 'l9', 'media')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i>
+                  <span>Média Diária</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 3: Análise & Comparador Berrini / Pinheiros -->
+              <button type="button" class="wagon-item" data-menu="studio" onclick="selectStationWagon(event, 'l9', 'studio')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="sliders-horizontal" style="width: 14px; height: 14px;"></i>
+                  <span>Análise L9</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 4: Exportar Dados da L9 -->
+              <button type="button" class="wagon-item" data-menu="export" onclick="selectStationWagon(event, 'l9', 'export')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                  <span>Baixar Excel</span>
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+            </div>
+
+            <!-- Cabine Frontal da Linha 9 com Letreiro LED Matrix -->
+            <div class="train-cabin" title="Clique para manobrar o trem da Linha 9 - Esmeralda">
+              <div class="cabin-stripe"></div>
+              <div class="cabin-top-row">
+                <div class="led-matrix-housing" title="Letreiro Digital de Destino">
+                  <span id="led-text-l9" class="led-matrix-text">L9 • DESTINO: ESMERALDA • VARGINHA</span>
+                </div>
+                <div class="windshield"></div>
+              </div>
+              <div class="cabin-bottom-row">
+                <span class="cabin-label">
+                  <span class="cabin-status-dot"></span>
+                  Esmeralda
+                </span>
+              </div>
+              <div class="headlights"></div>
+            </div>
+
+          </div>
+
+          <!-- Dica visual no trilho quando fechado -->
+          <div class="track-hint">
+            <i data-lucide="mouse-pointer-click" style="width: 14px; height: 14px; color: #10b981;"></i>
+            <span>Sinal Vermelho • Clique na cabine da <strong>Linha 9 (Esmeralda)</strong> para liberar partida</span>
+          </div>
+
+          <!-- Para-choque de limite de via e Dormentes -->
+          <div class="buffer-stop" title="Para-choque de Fim de Via"></div>
+          <div class="railway-bed"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 1: VISÃO GERAL EXECUTIVA -->
+    <!-- ======================================================== -->
+    <section id="tab-overview" class="tab-pane active">
+      <!-- KPI Metric Cards Grid -->
+      <div class="kpi-grid">
+        <div class="glass-panel kpi-card total" id="overview-kpi-total">
+          <div class="kpi-header">
+            <span class="kpi-title">Passageiros Totais (L8 + L9)</span>
+            <span class="kpi-badge badge-gold">Consolidado</span>
+          </div>
+          <div class="kpi-value" id="kpi-total-pass">---</div>
+          <div id="overview-trend-total" style="display: flex; gap: 4px; margin: 4px 0;"></div>
+          <div class="kpi-subtext" id="kpi-total-sub">Carregando dados...</div>
+        </div>
+
+        <div class="glass-panel kpi-card revenue" id="overview-kpi-rev">
+          <div class="kpi-header">
+            <span class="kpi-title">Receita Estimada Total</span>
+            <span class="kpi-badge badge-gold">R$ Contratual</span>
+          </div>
+          <div class="kpi-value" id="kpi-total-rev">---</div>
+          <div id="overview-trend-rev" style="display: flex; gap: 4px; margin: 4px 0;"></div>
+          <div class="kpi-subtext" id="kpi-rev-sub">Carregando dados...</div>
+        </div>
+
+        <div class="glass-panel kpi-card l8 l8-glow" id="overview-kpi-l8">
+          <div class="kpi-header">
+            <span class="kpi-title">Linha 8 - Diamante</span>
+            <span class="kpi-badge badge-l8">23 Estações</span>
+          </div>
+          <div class="kpi-value" id="kpi-l8-pass" style="color: #38bdf8;">---</div>
+          <div id="overview-trend-l8" style="display: flex; gap: 4px; margin: 4px 0;"></div>
+          <div class="kpi-subtext" id="kpi-l8-sub">Amador Bueno a Júlio Prestes</div>
+        </div>
+
+        <div class="glass-panel kpi-card l9 l9-glow" id="overview-kpi-l9">
+          <div class="kpi-header">
+            <span class="kpi-title">Linha 9 - Esmeralda</span>
+            <span class="kpi-badge badge-l9">21 Estações</span>
+          </div>
+          <div class="kpi-value" id="kpi-l9-pass" style="color: #10b981;">---</div>
+          <div id="overview-trend-l9" style="display: flex; gap: 4px; margin: 4px 0;"></div>
+          <div class="kpi-subtext" id="kpi-l9-sub">Ceasa a Varginha (Eixo Berrini)</div>
+        </div>
+      </div>
+
+      <!-- Linha 8 Diamante 3D & Average Chart Section -->
+      <div class="glass-panel diamond-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span class="material-symbols-outlined" style="color: #38bdf8; font-size: 26px;">diamond</span>
+            <div>
+              <h3 style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; color: #fff;">
+                Linha 8 • Diamante: Interação 3D &amp; Gráfico de Média de Arrecadação e Fluxo
+              </h3>
+              <p style="font-size: 0.72rem; color: #94a3b8;">
+                Visualização 3D interativa de diamante com telemetria e análise de médias de arrecadação e passageiros baseada nas colunas TD e DS do MD.xlsx
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="kpi-badge badge-l8">Diamante 3D Interativo</span>
+            <span style="font-size: 0.75rem; color: #64748b;">(Gire com o mouse)</span>
+          </div>
+        </div>
+
+        <div class="diamond-grid">
+          <!-- Left: 3D Diamond Canvas -->
+          <div class="diamond-3d-box" id="diamond-3d-box">
+            <canvas id="diamond-3d-canvas"></canvas>
+            <div class="diamond-overlay-badge">
+              <div>
+                <div style="font-size: 0.65rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Linha 8 • Diamante</div>
+                <div style="font-size: 0.82rem; font-weight: 700; color: #fff;">23 Estações • 275.3K/dia</div>
+              </div>
+              <span class="material-symbols-outlined" style="color: #38bdf8; font-size: 20px;">view_in_ar</span>
+            </div>
+          </div>
+
+          <!-- Right: Average Chart with Menus & Download -->
+          <div style="display: flex; flex-direction: column;">
+            
+            <!-- Toolbar with Multi-select Menus & Downloads -->
+            <div class="diamond-toolbar">
+              
+              <!-- Menu 1: Anos (Múltipla Seleção) -->
+              <div class="multiselect-wrapper" id="wrap-avg-years">
+                <button type="button" class="multiselect-btn" id="btn-avg-years">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #38bdf8;">calendar_today</span>
+                  <span>Anos</span>
+                  <span class="badge-count" id="badge-avg-years">5</span>
+                  <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="multiselect-menu" id="menu-avg-years">
+                  <div class="multiselect-header">
+                    <span>SELECIONAR ANOS</span>
+                    <div class="mini-chips-group">
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgYears(true)">Todos</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgYears(false)">Limpar</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgRecentYears()">24-26</button>
+                    </div>
+                  </div>
+                  <div class="multiselect-options-list">
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-year" value="2022" checked> 2022</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-year" value="2023" checked> 2023</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-year" value="2024" checked> 2024</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-year" value="2025" checked> 2025</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-year" value="2026" checked> 2026</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Menu 2: Meses (Múltipla Seleção com Busca Rápida) -->
+              <div class="multiselect-wrapper" id="wrap-avg-months">
+                <button type="button" class="multiselect-btn" id="btn-avg-months">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #10b981;">date_range</span>
+                  <span>Meses</span>
+                  <span class="badge-count" id="badge-avg-months">12</span>
+                  <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="multiselect-menu" id="menu-avg-months" style="min-width: 270px;">
+                  <div class="multiselect-header">
+                    <span>SELECIONAR MESES</span>
+                    <div class="mini-chips-group">
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgMonths(true)">Todos</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgMonths(false)">Limpar</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgMonthsSemester(1)">1º Sem</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgMonthsSemester(2)">2º Sem</button>
+                    </div>
+                  </div>
+                  <!-- Quick search within months -->
+                  <div class="menu-search-wrapper">
+                    <span class="material-symbols-outlined menu-search-icon">search</span>
+                    <input type="text" class="menu-search-input" placeholder="Filtrar mês..." oninput="filterMenuOptions(this, 'menu-avg-months')" onkeyup="filterMenuOptions(this, 'menu-avg-months')">
+                  </div>
+                  <div class="multiselect-options-grid-2">
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="1" checked> Janeiro</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="7" checked> Julho</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="2" checked> Fevereiro</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="8" checked> Agosto</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="3" checked> Março</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="9" checked> Setembro</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="4" checked> Abril</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="10" checked> Outubro</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="5" checked> Maio</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="11" checked> Novembro</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="6" checked> Junho</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-month" value="12" checked> Dezembro</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Menu 3: Dias da Semana (DS - Múltipla Seleção) -->
+              <div class="multiselect-wrapper" id="wrap-avg-ds">
+                <button type="button" class="multiselect-btn" id="btn-avg-ds">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #fbbf24;">view_week</span>
+                  <span>Dias da Semana</span>
+                  <span class="badge-count" id="badge-avg-ds">7</span>
+                  <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="multiselect-menu" id="menu-avg-ds" style="min-width: 260px;">
+                  <div class="multiselect-header">
+                    <span>DIAS DA SEMANA (DS)</span>
+                    <div class="mini-chips-group">
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgDS(true)">Todos</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgDS(false)">Limpar</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgDSWorkdays()">Seg-Sex</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgDSWeekend()">Sáb-Dom</button>
+                    </div>
+                  </div>
+                  <div class="multiselect-options-list">
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="seg" checked> Segunda-feira (seg)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="ter" checked> Terça-feira (ter)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="qua" checked> Quarta-feira (qua)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="qui" checked> Quinta-feira (qui)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="sex" checked> Sexta-feira (sex)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="sáb" checked> Sábado (sáb)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-ds" value="dom" checked> Domingo (dom)</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Menu 4: Tipo de Dia (TD - Útil e Fim - Múltipla Seleção) -->
+              <div class="multiselect-wrapper" id="wrap-avg-td">
+                <button type="button" class="multiselect-btn" id="btn-avg-td">
+                  <span class="material-symbols-outlined" style="font-size: 16px; color: #a855f7;">splitscreen</span>
+                  <span>Útil & Fim</span>
+                  <span class="badge-count" id="badge-avg-td">2</span>
+                  <span class="material-symbols-outlined arrow-icon">expand_more</span>
+                </button>
+                <div class="multiselect-menu" id="menu-avg-td" style="min-width: 220px;">
+                  <div class="multiselect-header">
+                    <span>TIPO DE DIA (TD)</span>
+                    <div class="mini-chips-group">
+                      <button type="button" class="mini-chip-btn" onclick="setAllAvgTD(true)">Todos</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgTDOnly('Útil')">Útil</button>
+                      <button type="button" class="mini-chip-btn" onclick="setAvgTDOnly('FIN')">FIN</button>
+                    </div>
+                  </div>
+                  <div class="multiselect-options-list">
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-td" value="Útil" checked> Dia Útil (Útil)</label>
+                    <label class="multiselect-item"><input type="checkbox" class="cb-avg-td" value="FIN" checked> Fim de Semana / Feriado (FIN)</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Menu 5: Escopo de Linhas & Estações -->
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="filter-label">Linhas:</span>
+                <select id="avg-scope-select" class="select-custom">
+                  <option value="l8">Linha 8 - Diamante (Todas as 23 estações)</option>
+                  <option value="l9">Linha 9 - Esmeralda (Todas as 21 estações)</option>
+                  <option value="both">Ambas as Linhas 8 e 9 (Todas as 44 estações)</option>
+                  <option value="compare">Comparativo (Total Linha 8 vs Linha 9)</option>
+                </select>
+              </div>
+
+              <!-- Menu 6: Agrupamento / Eixo do Gráfico (Estações vs Meses vs Dias da Semana) -->
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="filter-label">Eixo:</span>
+                <select id="avg-dimension-select" class="select-custom" onchange="if(window.state){ state.l8Avg.dimension = this.value; if(window.renderL8AveragesChart) renderL8AveragesChart(); }">
+                  <option value="stations">Estações</option>
+                  <option value="months">Mês a Mês (Jan a Dez)</option>
+                  <option value="ds">Dias da Semana (Seg a Dom)</option>
+                </select>
+              </div>
+
+              <!-- Menu 7: Tipo / Formato do Gráfico -->
+              <div style="display: flex; align-items: center; gap: 0.35rem;">
+                <span class="filter-label">Gráfico:</span>
+                <select id="avg-chart-type-select" class="select-custom" onchange="if(window.state){ state.l8Avg.chartType = this.value; if(window.renderL8AveragesChart) renderL8AveragesChart(); }">
+                  <option value="bar">📊 Barras Verticais</option>
+                  <option value="horizontalBar">📑 Barras Horizontais</option>
+                  <option value="line">📈 Linhas com Área</option>
+                  <option value="doughnut">🍩 Rosca / Proporção</option>
+                  <option value="pie">🍕 Pizza / Setores</option>
+                </select>
+              </div>
+
+              <!-- Download Buttons Group -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <button id="btn-download-avg-png" class="download-btn" title="Baixar imagem PNG em alta resolução">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">image</span>
+                  Baixar PNG
+                </button>
+                <button id="btn-download-avg-excel" class="download-btn excel" title="Baixar planilha nativa do Microsoft Excel (.xlsx)">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">table_view</span>
+                  Baixar Excel (.xlsx)
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Average Chart Canvas Container -->
+            <div class="chart-container-inner" style="height: 310px; width: 100%;">
+              <canvas id="l8-averages-chart"></canvas>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- =========================================================================
+           MAPA VETORIAL INTERATIVO DE FLUXO & GESTÃO DE ARRECADAÇÃO (LINHAS 8 E 9)
+           Adaptado de mapa_interativo_fluxo_de_passageiros_viamobilidade_linhas_8_e_9.html
+           ========================================================================= -->
+      <section class="mapa-section">
+        
+        <!-- 1. BARRA SUPERIOR: IDENTIDADE + FILTROS DE ANO, MÊS, BUSCA E LINHA -->
+        <div class="glass-panel mapa-header-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            
+            <!-- Identidade do Painel -->
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <div style="width: 44px; height: 44px; border-radius: 12px; background: #050912; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; overflow: hidden; position: relative; flex-shrink: 0;">
+                <div style="width: 100%; height: 50%; background-color: #9E9E93;"></div>
+                <div style="width: 100%; height: 50%; background-color: #00A88F;"></div>
+                <span class="font-mono-tech" style="position: absolute; inset: 4px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px; color: #04070e; background: rgba(255,255,255,0.9); border-radius: 6px;">
+                  8•9
+                </span>
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                  <span class="kpi-badge badge-l9" style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
+                    ViaMobilidade • Gestão de Arrecadação
+                  </span>
+                  <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0;">
+                    Painel de Giro de Catraca & Receita Tarifária • Linhas 8 e 9
+                  </h3>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  Clique em qualquer uma das <strong>41 estações</strong> no mapa para auditar o fluxo de passageiros, meios de pagamento e bloqueios por <strong>Ano</strong> e <strong>Mês</strong>.
+                </p>
+              </div>
+            </div>
+
+            <!-- Controles Globais de Filtro do Mapa -->
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+              
+              <!-- Filtro de ANO -->
+              <div style="background: #050912; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 0.35rem 0.65rem; display: flex; align-items: center; gap: 0.4rem;">
+                <label for="map-filter-year" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;">
+                  <i data-lucide="calendar" style="width: 14px; height: 14px; color: #00A88F;"></i>
+                  Ano:
+                </label>
+                <select id="map-filter-year" onchange="handleMapPeriodFilterChange()" class="select-custom" style="padding: 0.2rem 0.4rem; background: transparent; border: none; font-weight: 700; color: #fff;">
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024" selected>2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+
+              <!-- Filtro de MÊS -->
+              <div style="background: #050912; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 0.35rem 0.65rem; display: flex; align-items: center; gap: 0.4rem;">
+                <label for="map-filter-month" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;">
+                  <i data-lucide="clock" style="width: 14px; height: 14px; color: #fbbf24;"></i>
+                  Mês:
+                </label>
+                <select id="map-filter-month" onchange="handleMapPeriodFilterChange()" class="select-custom" style="padding: 0.2rem 0.4rem; background: transparent; border: none; font-weight: 700; color: #fff;">
+                  <option value="all" selected>Ano Inteiro (Acumulado)</option>
+                  <option value="0">Janeiro</option>
+                  <option value="1">Fevereiro</option>
+                  <option value="2">Março</option>
+                  <option value="3">Abril</option>
+                  <option value="4">Maio</option>
+                  <option value="5">Junho</option>
+                  <option value="6">Julho</option>
+                  <option value="7">Agosto</option>
+                  <option value="8">Setembro</option>
+                  <option value="9">Outubro</option>
+                  <option value="10">Novembro</option>
+                  <option value="11">Dezembro</option>
+                </select>
+              </div>
+
+              <!-- Busca de Estação -->
+              <div style="position: relative;">
+                <i data-lucide="search" style="width: 14px; height: 14px; color: #64748b; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);"></i>
+                <input 
+                  id="map-station-search" 
+                  type="text" 
+                  oninput="handleMapStationSearch(this.value)"
+                  placeholder="Buscar estação (ex: Pinheiros, Osasco)..." 
+                  style="padding: 0.4rem 0.65rem 0.4rem 2rem; background: #050912; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); font-size: 12px; color: #fff; width: 190px; outline: none;"
+                >
+              </div>
+
+              <!-- Seletor de Linha -->
+              <div style="display: inline-flex; border-radius: var(--radius-sm); background: #050912; padding: 2px; border: 1px solid rgba(255,255,255,0.1); gap: 2px;">
+                <button type="button" onclick="setMapFilter('all')" id="filter-all" class="chip-btn active" style="font-size: 11px; padding: 0.3rem 0.6rem;">
+                  Ambas
+                </button>
+                <button type="button" onclick="setMapFilter('L8')" id="filter-L8" class="chip-btn" style="font-size: 11px; padding: 0.3rem 0.6rem; display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #9E9E93; display: inline-block;"></span>
+                  Linha 8
+                </button>
+                <button type="button" onclick="setMapFilter('L9')" id="filter-L9" class="chip-btn" style="font-size: 11px; padding: 0.3rem 0.6rem; display: flex; align-items: center; gap: 4px;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #00A88F; display: inline-block;"></span>
+                  Linha 9
+                </button>
+                <button type="button" onclick="setMapFilter('transfer')" id="filter-transfer" class="chip-btn" style="font-size: 11px; padding: 0.3rem 0.6rem; display: flex; align-items: center; gap: 4px;">
+                  <i data-lucide="git-compare" style="width: 12px; height: 12px; color: #fbbf24;"></i>
+                  Baldeações
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 2. CARDS DE RESUMO DA REDE NO PERÍODO SELECIONADO -->
+          <div class="mapa-kpis-grid" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
+            
+            <!-- KPI 1: Total Giro de Catraca L8 + L9 -->
+            <div class="mapa-kpi-card" id="map-kpi-card-total">
+              <div>
+                <span id="kpi-period-label" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block;">
+                  Giro Total Rede (2024)
+                </span>
+                <strong id="kpi-total-network" class="font-mono-tech" style="font-size: 1.35rem; font-weight: 800; color: #fff; display: block; margin: 0.2rem 0;">
+                  ...
+                </strong>
+                <span id="kpi-network-revenue" class="font-mono-tech" style="font-size: 11px; color: #10b981; font-weight: 600; display: block;">
+                  Arrecadação Bruta: R$ ...
+                </span>
+                <div id="map-trend-total" style="display: flex; gap: 4px; margin-top: 5px;"></div>
+              </div>
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; color: #10b981; flex-shrink: 0;">
+                <i data-lucide="wallet" style="width: 20px; height: 20px;"></i>
+              </div>
+            </div>
+
+            <!-- KPI 2: Demanda & Arrecadação Linha 8 - Diamante -->
+            <div class="mapa-kpi-card" id="map-kpi-card-l8">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #9E9E93;"></span>
+                  <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #cbd5e1;">Linha 8 - Diamante</span>
+                </div>
+                <strong id="kpi-total-l8" class="font-mono-tech" style="font-size: 1.35rem; font-weight: 800; color: #fff; display: block; margin: 0.2rem 0;">
+                  ...
+                </strong>
+                <span id="kpi-share-l8" class="font-mono-tech" style="font-size: 11px; color: #9E9E93; font-weight: 600; display: block;">
+                  ...
+                </span>
+                <div id="map-trend-l8" style="display: flex; gap: 4px; margin-top: 5px;"></div>
+              </div>
+              <div class="font-mono-tech" style="width: 38px; height: 38px; border-radius: 10px; background: #9E9E93; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #04070e; flex-shrink: 0;">
+                L8
+              </div>
+            </div>
+
+            <!-- KPI 3: Demanda & Arrecadação Linha 9 - Esmeralda -->
+            <div class="mapa-kpi-card" id="map-kpi-card-l9">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #00A88F;"></span>
+                  <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #cbd5e1;">Linha 9 - Esmeralda</span>
+                </div>
+                <strong id="kpi-total-l9" class="font-mono-tech" style="font-size: 1.35rem; font-weight: 800; color: #fff; display: block; margin: 0.2rem 0;">
+                  ...
+                </strong>
+                <span id="kpi-share-l9" class="font-mono-tech" style="font-size: 11px; color: #00A88F; font-weight: 600; display: block;">
+                  ...
+                </span>
+                <div id="map-trend-l9" style="display: flex; gap: 4px; margin-top: 5px;"></div>
+              </div>
+              <div class="font-mono-tech" style="width: 38px; height: 38px; border-radius: 10px; background: #00A88F; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #04070e; flex-shrink: 0;">
+                L9
+              </div>
+            </div>
+
+            <!-- KPI 4: Estação Selecionada em Destaque -->
+            <div class="mapa-kpi-card" style="border-color: rgba(250, 204, 21, 0.35); background: linear-gradient(135deg, rgba(5,9,18,0.95), rgba(30,27,15,0.7));">
+              <div style="min-width: 0; padding-right: 0.5rem;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #facc15; display: flex; align-items: center; gap: 0.3rem;">
+                  <i data-lucide="mouse-pointer-click" style="width: 13px; height: 13px;"></i>
+                  Estação em Auditoria
+                </span>
+                <strong id="kpi-selected-station-name" style="font-size: 1.15rem; font-weight: 800; color: #fff; display: block; margin: 0.2rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  Pinheiros
+                </strong>
+                <span id="kpi-selected-station-pax" class="font-mono-tech" style="font-size: 11px; color: #fde047; font-weight: 700;">
+                  ...
+                </span>
+              </div>
+              <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.35); display: flex; align-items: center; justify-content: center; color: #facc15; flex-shrink: 0;">
+                <i data-lucide="receipt" style="width: 20px; height: 20px;"></i>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. GRID CENTRAL: MAPA INTERATIVO (ESQUERDA) + PAINEL DA ESTAÇÃO (DIREITA) -->
+        <div class="mapa-main-grid">
+          
+          <!-- COLUNA ESQUERDA: MAPA VETORIAL DAS LINHAS 8 E 9 -->
+          <div class="glass-panel" style="padding: 1rem; border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 0.75rem;">
+            
+            <!-- Barra de Legenda e Ferramentas do Mapa -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-bottom: 0.65rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
+              
+              <!-- Legenda Oficial -->
+              <div style="display: flex; align-items: center; gap: 1rem; font-size: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #e2e8f0;">
+                  <span style="width: 20px; height: 6px; border-radius: 9999px; background-color: #9E9E93; display: inline-block;"></span>
+                  <span>Linha 8 - Diamante <span style="color: var(--text-muted); font-weight: 400;">(Júlio Prestes ⇄ Amador Bueno)</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; color: #e2e8f0;">
+                  <span style="width: 20px; height: 6px; border-radius: 9999px; background-color: #00A88F; display: inline-block;"></span>
+                  <span>Linha 9 - Esmeralda <span style="color: var(--text-muted); font-weight: 400;">(Osasco ⇄ Varginha)</span></span>
+                </div>
+              </div>
+
+              <!-- Botões de Ação do Mapa -->
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <!-- Exportar CSV Gestão de Arrecadação -->
+                <button type="button" onclick="exportArrecadacaoCSV()" class="chip-btn" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); font-weight: 700; display: flex; align-items: center; gap: 0.35rem; font-size: 11px;" title="Exportar planilha CSV de Giro de Catraca e Arrecadação do período filtrado">
+                  <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                  <span>Exportar CSV</span>
+                </button>
+
+                <!-- Alternar Halos de Demanda -->
+                <button type="button" onclick="toggleHeatmapBubbles()" id="btn-heatmap-bubbles" class="chip-btn" style="background: rgba(250, 204, 21, 0.15); color: #fde047; border: 1px solid rgba(250, 204, 21, 0.35); font-weight: 700; display: flex; align-items: center; gap: 0.35rem; font-size: 11px;" title="Exibir círculos proporcionais ao volume de passageiros em cada estação">
+                  <i data-lucide="flame" style="width: 14px; height: 14px;"></i>
+                  <span>Halos de Demanda: ON</span>
+                </button>
+
+                <!-- Controles de Zoom -->
+                <div style="display: inline-flex; align-items: center; background: #050912; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 2px;">
+                  <button type="button" onclick="zoomMap(1.2)" class="chip-btn" style="padding: 0.25rem 0.5rem; border: none; font-size: 12px;" title="Aproximar Zoom">
+                    <i data-lucide="zoom-in" style="width: 15px; height: 15px;"></i>
+                  </button>
+                  <button type="button" onclick="zoomMap(0.83)" class="chip-btn" style="padding: 0.25rem 0.5rem; border: none; font-size: 12px;" title="Afastar Zoom">
+                    <i data-lucide="zoom-out" style="width: 15px; height: 15px;"></i>
+                  </button>
+                  <button type="button" onclick="resetMapView()" class="chip-btn" style="padding: 0.25rem 0.5rem; border: none; font-size: 11px; font-weight: 700;" title="Centralizar Mapa">
+                    100%
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ÁREA DO MAPA SVG INTERATIVO -->
+            <div id="map-viewport" class="cco-map-canvas mapa-viewport-wrapper">
+              
+              <!-- Hover Card Flutuante das 41 Estações (ui-ux-designer & ui-visual-validator) -->
+              <div id="map-station-hover-card" class="station-hover-card" style="opacity: 0; pointer-events: none; position: absolute; z-index: 99; transform: scale(0.96); transition: opacity 0.16s ease, transform 0.16s ease;"></div>
+
+              <!-- Dica flutuante no canto superior esquerdo -->
+              <div class="mapa-floating-badge" style="top: 12px; left: 12px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 11px; color: #cbd5e1;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #facc15; display: inline-block;"></span>
+                  <span><strong>Clique em qualquer estação</strong> para auditar passageiros • Arraste para mover</span>
+                </div>
+              </div>
+
+              <!-- Indicador de período no canto superior direito -->
+              <div class="mapa-floating-badge" style="top: 12px; right: 12px; text-align: right;">
+                <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block;">Período em Exibição</span>
+                <strong id="map-corner-period" class="font-mono-tech" style="font-size: 12px; color: #00A88F;">2024 (ACUMULADO)</strong>
+              </div>
+
+              <!-- Legenda no canto inferior esquerdo -->
+              <div class="mapa-floating-badge" style="bottom: 12px; left: 12px; display: flex; align-items: center; gap: 0.75rem; font-size: 11px;">
+                <span style="display: flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #9E9E93; display: inline-block;"></span>
+                  Linha 8
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.35rem; font-weight: 600;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #00A88F; display: inline-block;"></span>
+                  Linha 9
+                </span>
+                <span style="display: flex; align-items: center; gap: 0.35rem; font-weight: 600; color: #fde047;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #facc15; background: #050912; display: inline-block;"></span>
+                  Selecionada
+                </span>
+              </div>
+
+              <!-- SVG PRINCIPAL -->
+              <svg id="viamobilidade-svg" viewBox="0 0 1120 680" style="width: 100%; height: 100%;">
+                <defs>
+                  <filter id="glow-l8" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#9E9E93" flood-opacity="0.55"/>
+                  </filter>
+                  <filter id="glow-l9" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00A88F" flood-opacity="0.65"/>
+                  </filter>
+                </defs>
+
+                <!-- Grupo Raiz com suporte a Pan & Zoom -->
+                <g id="svg-pan-zoom-group">
+                  <!-- Referência Hidrográfica (Rio Tietê e Rio Pinheiros) -->
+                  <path d="M 30,118 Q 420,108 680,122 T 1070,96" fill="none" stroke="#0b1324" stroke-width="26" stroke-linecap="round" />
+                  <text x="235" y="122" fill="#1e293b" font-size="10" font-weight="800" letter-spacing="2.5">RIO TIETÊ</text>
+
+                  <path d="M 555,122 L 580,260 L 664,345 L 664,645" fill="none" stroke="#0b1324" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+                  <text x="682" y="415" fill="#1e293b" font-size="10" font-weight="800" letter-spacing="2.5" transform="rotate(90 682,415)">RIO PINHEIROS (MARGINAL)</text>
+
+                  <!-- Caixa Destaque do Trecho Paralelo Osasco ⇄ Presidente Altino -->
+                  <rect x="470" y="136" width="94" height="56" rx="12" fill="rgba(15, 23, 42, 0.8)" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4" />
+                  <text x="517" y="128" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="800" font-family="JetBrains Mono">
+                    INTEGRAÇÃO L8 ⇄ L9
+                  </text>
+
+                  <!-- 1. Camada de Halos de Demanda (Bolhas Proporcionais) -->
+                  <g id="svg-heatmap-layer"></g>
+
+                  <!-- 2. Camada de Trilhos das Linhas 8 (#9E9E93) e 9 (#00A88F) -->
+                  <g id="svg-tracks-layer"></g>
+
+                  <!-- 3. Camada de Estações (41 Estações + Rótulos + Passageiros) -->
+                  <g id="svg-stations-layer"></g>
+                </g>
+              </svg>
+            </div>
+
+          </div>
+
+          <!-- COLUNA DIREITA: PAINEL GESTÃO DE ARRECADAÇÃO DA ESTAÇÃO -->
+          <aside class="glass-panel station-audit-panel">
+            
+            <!-- Cabeçalho da Estação -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+              <div>
+                <div id="st-detail-badges" style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                  <!-- Injetado via JS -->
+                </div>
+                <h2 id="st-detail-name" style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 800; color: #fff; margin: 0;">
+                  Pinheiros
+                </h2>
+                <p id="st-detail-city" style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem;">
+                  <i data-lucide="map-pin" style="width: 13px; height: 13px; color: #00A88F;"></i>
+                  <span>Município: <strong>São Paulo</strong> • Km 18,3</span>
+                </p>
+              </div>
+
+              <!-- Ranking da Estação na Linha -->
+              <div style="background: #050912; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 0.4rem 0.65rem; text-align: right; flex-shrink: 0;">
+                <span style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block;">Ranking Fluxo</span>
+                <strong id="st-detail-rank" class="font-mono-tech" style="font-size: 12px; font-weight: 800; color: #facc15;">#1 na Linha 9</strong>
+              </div>
+            </div>
+
+            <!-- BLOCO PRINCIPAL: GIRO DE CATRACA (PASSAGEIROS) & RECEITA ESTIMADA -->
+            <div style="background: #050912; border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 1rem; position: relative; overflow: hidden;">
+              <div id="st-accent-bar" style="position: absolute; top: 0; left: 0; bottom: 0; width: 5px; background-color: #00A88F;"></div>
+              
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                <span id="st-passengers-period-title" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">
+                  Passageiros (Giro) • 2024
+                </span>
+                <div id="st-passengers-trends" style="display: flex; gap: 4px; align-items: center;">
+                  <span id="st-passengers-yoy" class="trend-badge trend-up">+5,4% YoY</span>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: baseline; gap: 0.5rem; margin: 0.35rem 0;">
+                <strong id="st-passengers-total" class="font-mono-tech" style="font-size: 2rem; font-weight: 800; color: #fff;">
+                  ...
+                </strong>
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">passageiros</span>
+              </div>
+
+              <!-- Receita Tarifária Estimada -->
+              <div style="margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="banknote" style="width: 15px; height: 15px; color: #10b981;"></i>
+                  Receita Tarifária Estimada:
+                </span>
+                <strong id="st-revenue-total" class="font-mono-tech" style="font-size: 13px; font-weight: 800; color: #10b981;">
+                  R$ ...
+                </strong>
+              </div>
+
+              <p id="st-passengers-share" style="font-size: 11px; color: var(--text-muted); margin-top: 0.4rem;">
+                ...
+              </p>
+
+              <!-- Sub-métricas de Fluxo da Estação -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+                <div style="background: rgba(15, 23, 42, 0.7); border-radius: var(--radius-sm); padding: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+                  <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block;">Média Dia Útil</span>
+                  <strong id="st-daily-avg" class="font-mono-tech" style="font-size: 12px; font-weight: 700; color: #fff; display: block; margin-top: 2px;">...</strong>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.7); border-radius: var(--radius-sm); padding: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+                  <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block;">Média Fim Sem.</span>
+                  <strong id="st-paying-pax" class="font-mono-tech" style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-top: 2px;">...</strong>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.7); border-radius: var(--radius-sm); padding: 0.4rem; border: 1px solid rgba(255,255,255,0.05);">
+                  <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block;">Hora Pico</span>
+                  <strong id="st-peak-hour" class="font-mono-tech" style="font-size: 12px; font-weight: 700; color: #facc15; display: block; margin-top: 2px;">...</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- CANAIS DE ARRECADAÇÃO NA CATRACA -->
+            <div style="background: #050912; border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #e2e8f0; display: flex; align-items: center; gap: 0.35rem; margin: 0;">
+                  <i data-lucide="credit-card" style="width: 14px; height: 14px; color: #00A88F;"></i>
+                  Meios de Pagamento na Catraca
+                </h4>
+                <span id="st-payment-status-badge" class="font-mono-tech" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25);">
+                  • Estimativa Real
+                </span>
+              </div>
+
+              <div id="st-payment-channels" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- INFRAESTRUTURA DE BLOQUEIOS E ATMS -->
+            <div style="background: #050912; border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+                  <i data-lucide="cpu" style="width: 14px; height: 14px; color: #facc15;"></i>
+                  Parque de Arrecadação
+                </span>
+                <span id="st-equipment-status-badge" class="font-mono-tech" style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #0b111e; color: #94a3b8; border: 1px solid rgba(255,255,255,0.1);">
+                  • Disponível
+                </span>
+              </div>
+              <div id="st-equipment-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; text-align: center;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- GRÁFICO INTERATIVO DE EVOLUÇÃO MENSAL (12 MESES) -->
+            <div style="background: #050912; border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h4 id="chart-station-title" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #e2e8f0; display: flex; align-items: center; gap: 0.35rem; margin: 0;">
+                    <i data-lucide="bar-chart-2" style="width: 14px; height: 14px; color: #00A88F;"></i>
+                    Sazonalidade Mensal
+                  </h4>
+                  <p style="font-size: 10px; color: var(--text-muted); margin: 2px 0 0 0;">Clique em uma barra para auditar o mês</p>
+                </div>
+                <span id="chart-year-badge" class="font-mono-tech" style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #0b111e; color: #fff; border: 1px solid rgba(255,255,255,0.1);">
+                  2024
+                </span>
+              </div>
+
+              <!-- Barras dos 12 Meses -->
+              <div id="monthly-chart-bars" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; align-items: flex-end; height: 95px; padding-top: 10px;">
+                <!-- Renderizado dinamicamente via JS -->
+              </div>
+            </div>
+
+            <!-- Botão de Ação Rápida para Abrir na Análise -->
+            <button type="button" id="btn-open-in-studio" class="download-btn excel" style="width: 100%; justify-content: center; font-size: 12px; padding: 0.65rem;" onclick="openSelectedStationInStudio()">
+              <span class="material-symbols-outlined" style="font-size: 16px;">insights</span>
+              Comparar Estação na Aba Análise
+            </button>
+
+          </aside>
+
+        </div>
+
+        <!-- 4. SEÇÃO INFERIOR: TOP 10 ESTAÇÕES MAIS MOVIMENTADAS NO PERÍODO FILTRADO -->
+        <div class="glass-panel" style="padding: 1.25rem; border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="trophy" style="width: 18px; height: 18px; color: #facc15;"></i>
+              <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.03em; margin: 0;">
+                Ranking das 10 Estações com Maior Fluxo de Passageiros no Período
+              </h3>
+            </div>
+            <span id="ranking-period-subtitle" class="font-mono-tech" style="font-size: 11px; color: var(--text-muted);">
+              Clique em qualquer card abaixo para focar a estação no mapa
+            </span>
+          </div>
+
+          <div id="top-stations-grid" class="top-ranking-grid">
+            <!-- Renderizado dinamicamente via JS de acordo com Ano, Mês e Linha -->
+          </div>
+        </div>
+
+        <!-- Destaque: Picos Históricos de Demanda & Arrecadação em Grandes Eventos (Data Storytelling & KPI Design) -->
+        <div class="glass-panel" style="padding: 1.25rem 1.5rem; margin-top: 1.25rem; border: 1px solid rgba(250, 204, 21, 0.25); background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(6, 11, 25, 0.95) 100%);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.85rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="badge" style="background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.4); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px;">
+                  Auditoria Operacional & Data Storytelling
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+                  Impacto Tarifário em Polos Atratores
+                </span>
+              </div>
+              <h3 style="font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0.4rem 0 0 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="zap" style="width: 18px; height: 18px; color: #facc15;"></i>
+                Picos Históricos de Demanda & Arrecadação em Grandes Eventos
+              </h3>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); max-width: 480px; text-align: right; line-height: 1.4;">
+              Eventos extraordinários geram curvas assimétricas de arrecadação. Clique em <strong style="color: #facc15;">"Auditar no Mapa"</strong> em qualquer evento para sincronizar o mapa e a série temporal.
+            </div>
+          </div>
+
+          <div class="events-peaks-grid">
+            <!-- Card 1: GP de São Paulo F1 -->
+            <div class="event-peak-card l9">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--l9-esmeralda); text-transform: uppercase; letter-spacing: 0.04em;">Linha 9 • Interlagos</span>
+                  <span class="trend-badge trend-up">▲ +410% vs FDS</span>
+                </div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0 0 0.35rem 0;">
+                  🏎️ GP de São Paulo F1
+                </h4>
+                <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                  Estação <strong style="color: #fff;">Autódromo</strong> opera em regime de alta capacidade. Concentração massiva de passageiros em 3 dias com pico no domingo pós-corrida.
+                </p>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-muted);">Pico Diário Auditado:</span>
+                  <span class="font-mono-tech" style="color: #34d399; font-weight: 700;">86.420 pass.</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                  <span style="color: var(--text-muted);">Receita Estimada (Dia):</span>
+                  <span class="font-mono-tech" style="color: #facc15; font-weight: 700;">R$ 432.100</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-sm" onclick="focusEventStation('AUT', 2024, 11)" style="width: 100%; justify-content: center; gap: 0.4rem; font-size: 11px; font-weight: 700; border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+                <i data-lucide="crosshair" style="width: 13px; height: 13px;"></i>
+                Auditar Estação Autódromo (Nov)
+              </button>
+            </div>
+
+            <!-- Card 2: The Town & Lollapalooza -->
+            <div class="event-peak-card l9">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--l9-esmeralda); text-transform: uppercase; letter-spacing: 0.04em;">Linha 9 • Festivais</span>
+                  <span class="trend-badge trend-up">▲ +445% vs FDS</span>
+                </div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0 0 0.35rem 0;">
+                  🎸 The Town / Lollapalooza
+                </h4>
+                <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                  Operação expressa e semi-expressa 24 horas na Estação <strong style="color: #fff;">Autódromo</strong>, com dispersão contínua na madrugada e forte receita tarifária.
+                </p>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-muted);">Pico Diário Auditado:</span>
+                  <span class="font-mono-tech" style="color: #34d399; font-weight: 700;">92.850 pass.</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                  <span style="color: var(--text-muted);">Receita Estimada (Dia):</span>
+                  <span class="font-mono-tech" style="color: #facc15; font-weight: 700;">R$ 464.250</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-sm" onclick="focusEventStation('AUT', 2023, 9)" style="width: 100%; justify-content: center; gap: 0.4rem; font-size: 11px; font-weight: 700; border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+                <i data-lucide="crosshair" style="width: 13px; height: 13px;"></i>
+                Auditar The Town (Set)
+              </button>
+            </div>
+
+            <!-- Card 3: Megashows Allianz Parque -->
+            <div class="event-peak-card l8">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span style="font-size: 10px; font-weight: 800; color: var(--l8-diamante); text-transform: uppercase; letter-spacing: 0.04em;">Linha 8 • Allianz Parque</span>
+                  <span class="trend-badge trend-up">▲ +28% vs Média</span>
+                </div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0 0 0.35rem 0;">
+                  🏟️ Shows & Finais Allianz Parque
+                </h4>
+                <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                  Estação <strong style="color: #fff;">Palmeiras-Barra Funda</strong> absorve fluxos metropolitanos integrados com Linha 3-Vermelha e linhas da CPTM em noites de show.
+                </p>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-muted);">Pico Diário Auditado:</span>
+                  <span class="font-mono-tech" style="color: #34d399; font-weight: 700;">184.210 pass.</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                  <span style="color: var(--text-muted);">Receita Estimada (Dia):</span>
+                  <span class="font-mono-tech" style="color: #facc15; font-weight: 700;">R$ 921.050</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-sm" onclick="focusEventStation('BFU', 2024, 10)" style="width: 100%; justify-content: center; gap: 0.4rem; font-size: 11px; font-weight: 700; border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;">
+                <i data-lucide="crosshair" style="width: 13px; height: 13px;"></i>
+                Auditar Barra Funda (Out)
+              </button>
+            </div>
+
+            <!-- Card 4: Shows Internacionais MorumBIS -->
+            <div class="event-peak-card gold">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                  <span style="font-size: 10px; font-weight: 800; color: #facc15; text-transform: uppercase; letter-spacing: 0.04em;">Linha 9 • MorumBIS</span>
+                  <span class="trend-badge trend-up">▲ +82% vs Média</span>
+                </div>
+                <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; margin: 0 0 0.35rem 0;">
+                  🎤 Megashows MorumBIS
+                </h4>
+                <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin: 0;">
+                  Estação <strong style="color: #fff;">Morumbi</strong> registra incremento severo no período noturno com transbordo da Linha 4-Amarela e frotas de reforço.
+                </p>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 0.6rem 0.75rem; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-muted);">Pico Diário Auditado:</span>
+                  <span class="font-mono-tech" style="color: #34d399; font-weight: 700;">74.520 pass.</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                  <span style="color: var(--text-muted);">Receita Estimada (Dia):</span>
+                  <span class="font-mono-tech" style="color: #facc15; font-weight: 700;">R$ 372.600</span>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-sm" onclick="focusEventStation('MRB', 2024, 11)" style="width: 100%; justify-content: center; gap: 0.4rem; font-size: 11px; font-weight: 700; border-color: rgba(250, 204, 21, 0.4); color: #facc15;">
+                <i data-lucide="crosshair" style="width: 13px; height: 13px;"></i>
+                Auditar Morumbi (Nov)
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Overview Charts & Top Stations Row -->
+      <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.25rem;">
+        <div class="glass-panel chart-wrapper">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;">
+              Evolução Temporal Consolidada (Média Diária por Mês)
+            </h4>
+            <span style="font-size: 0.72rem; color: var(--text-subtle);">Série Histórica 2022-2026</span>
+          </div>
+          <div class="chart-container-inner" style="height: 320px;">
+            <canvas id="overview-trend-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-panel chart-wrapper">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;">
+              Top Estações Mais Movimentadas
+            </h4>
+            <span class="chip-btn" onclick="applyPreset('top5'); document.querySelector('.nav-tab-btn[data-tab=\'studio\']').click();">Ver Todas</span>
+          </div>
+          <div id="overview-top-stations" class="table-responsive">
+            <!-- Dynamic table -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- TAB 2: ANÁLISE COMPARATIVA DE ESTAÇÕES -->
+    <!-- ======================================================== -->
+    <section id="tab-studio" class="tab-pane">
+      <div class="studio-layout">
+        
+        <!-- Sidebar - Station Filter Palette -->
+        <aside class="glass-panel sidebar-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 0.95rem; font-weight: 700;">Estações</h3>
+            <span id="selected-count-badge" class="kpi-badge badge-l8">6 de 44</span>
+          </div>
+
+          <div class="search-input-box">
+            <span class="material-symbols-outlined icon">search</span>
+            <input type="text" id="station-search-input" placeholder="Buscar estação...">
+          </div>
+
+          <div class="preset-chips">
+            <button class="chip-btn preset-btn" data-preset="top5">Top 5 Geral</button>
+            <button class="chip-btn preset-btn" data-preset="corporate">Polos Corporativos</button>
+            <button class="chip-btn preset-btn" data-preset="hubs">Hubs de Conexão</button>
+            <button class="chip-btn preset-btn" data-preset="extremo_l8">Extremo Linha 8</button>
+            <button class="chip-btn preset-btn" data-preset="all">Selecionar Todas</button>
+            <button class="chip-btn preset-btn" data-preset="clear" style="color: #ef4444;">Limpar</button>
+          </div>
+
+          <!-- Grouped Tree List -->
+          <div class="stations-tree" id="stations-tree-list">
+            <!-- Injected by JS -->
+          </div>
+        </aside>
+
+        <!-- Main Chart & Table Canvas Area -->
+        <main class="studio-canvas">
+          
+          <!-- Análise Header & Filters Bar (Ano, Mês, Dia) -->
+          <div class="glass-panel" style="padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h3 style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="material-symbols-outlined" style="color: var(--l8-diamond); font-size: 1.3rem;">insights</span>
+                  Análise Comparativa de Estações • Gestão de Arrecadação
+                </h3>
+                <p style="font-size: 0.74rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  Filtros por Ano, Mês e Dia para cruzamento temporal, gráficos comparativos e mapa térmico.
+                </p>
+              </div>
+              <span id="studio-filtered-count-badge" class="kpi-badge badge-l8" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">
+                Carregando registros...
+              </span>
+            </div>
+
+            <!-- Filtros de Ano, Mês, Dia -->
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.85rem; padding-top: 0.65rem; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+              <!-- Ano -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="filter-label" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span class="material-symbols-outlined" style="font-size: 0.95rem; color: var(--l8-diamond);">calendar_today</span>
+                  Ano:
+                </span>
+                <select id="studio-filter-year" class="select-custom" style="min-width: 95px;">
+                  <option value="all">Todos os Anos</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                  <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                </select>
+              </div>
+
+              <!-- Mês -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="filter-label" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span class="material-symbols-outlined" style="font-size: 0.95rem; color: var(--l9-emerald);">date_range</span>
+                  Mês:
+                </span>
+                <select id="studio-filter-month" class="select-custom" style="min-width: 125px;">
+                  <option value="all">Todos os Meses</option>
+                  <option value="1">Janeiro</option>
+                  <option value="2">Fevereiro</option>
+                  <option value="3">Março</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Maio</option>
+                  <option value="6">Junho</option>
+                  <option value="7">Julho</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Setembro</option>
+                  <option value="10">Outubro</option>
+                  <option value="11">Novembro</option>
+                  <option value="12">Dezembro</option>
+                </select>
+              </div>
+
+              <!-- Tipo de Dia -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="filter-label" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span class="material-symbols-outlined" style="font-size: 0.95rem; color: #fbbf24;">work</span>
+                  Tipo de Dia:
+                </span>
+                <select id="studio-filter-daytype" class="select-custom" style="min-width: 130px;">
+                  <option value="all">Todos (Útil + FIN)</option>
+                  <option value="Útil">Dias Úteis</option>
+                  <option value="FIN">Fins de Semana / Feriados</option>
+                </select>
+              </div>
+
+              <!-- Dia da Semana -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="filter-label" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span class="material-symbols-outlined" style="font-size: 0.95rem; color: #a855f7;">view_week</span>
+                  Dia da Semana:
+                </span>
+                <select id="studio-filter-dayofweek" class="select-custom" style="min-width: 130px;">
+                  <option value="all">Todos os Dias</option>
+                  <option value="seg">Segunda-feira</option>
+                  <option value="ter">Terça-feira</option>
+                  <option value="qua">Quarta-feira</option>
+                  <option value="qui">Quinta-feira</option>
+                  <option value="sex">Sexta-feira</option>
+                  <option value="sáb">Sábado</option>
+                  <option value="dom">Domingo</option>
+                </select>
+              </div>
+
+              <!-- Dia do Mês -->
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <span class="filter-label" style="display: flex; align-items: center; gap: 0.25rem;">
+                  <span class="material-symbols-outlined" style="font-size: 0.95rem; color: #38bdf8;">today</span>
+                  Dia (1-31):
+                </span>
+                <select id="studio-filter-dayofmonth" class="select-custom" style="min-width: 90px;">
+                  <option value="all">Todos</option>
+                  <option value="1">Dia 01</option><option value="2">Dia 02</option><option value="3">Dia 03</option><option value="4">Dia 04</option><option value="5">Dia 05</option>
+                  <option value="6">Dia 06</option><option value="7">Dia 07</option><option value="8">Dia 08</option><option value="9">Dia 09</option><option value="10">Dia 10</option>
+                  <option value="11">Dia 11</option><option value="12">Dia 12</option><option value="13">Dia 13</option><option value="14">Dia 14</option><option value="15">Dia 15</option>
+                  <option value="16">Dia 16</option><option value="17">Dia 17</option><option value="18">Dia 18</option><option value="19">Dia 19</option><option value="20">Dia 20</option>
+                  <option value="21">Dia 21</option><option value="22">Dia 22</option><option value="23">Dia 23</option><option value="24">Dia 24</option><option value="25">Dia 25</option>
+                  <option value="26">Dia 26</option><option value="27">Dia 27</option><option value="28">Dia 28</option><option value="29">Dia 29</option><option value="30">Dia 30</option><option value="31">Dia 31</option>
+                </select>
+              </div>
+
+              <!-- Reset btn -->
+              <button type="button" id="studio-filters-reset-btn" class="chip-btn" style="color: #ef4444; margin-left: auto; display: flex; align-items: center; gap: 0.25rem;">
+                <span class="material-symbols-outlined" style="font-size: 0.9rem;">restart_alt</span>
+                Resetar Filtros
+              </button>
+            </div>
+          </div>
+
+          <!-- Visualization Control Bar -->
+          <div class="glass-panel chart-controls-bar">
+            
+            <!-- Chart Type Switcher -->
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span class="filter-label" style="margin-right: 0.25rem;">Formato:</span>
+              <button class="chip-btn chart-type-btn active" data-type="line">📈 Linhas</button>
+              <button class="chip-btn chart-type-btn" data-type="bar">📊 Barras</button>
+              <button class="chip-btn chart-type-btn" data-type="heatmap">🟩 Heatmap</button>
+              <button class="chip-btn chart-type-btn" data-type="radar">🕸️ Radar</button>
+            </div>
+
+            <!-- Metric Selector -->
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span class="filter-label" style="margin-right: 0.25rem;">Métrica:</span>
+              <button class="chip-btn metric-btn active" data-metric="passengers">Passageiros (Entradas)</button>
+              <button class="chip-btn metric-btn" data-metric="revenue">Receita Estimada (R$)</button>
+            </div>
+
+            <!-- Time Granularity -->
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span class="filter-label" style="margin-right: 0.25rem;">Agrupamento:</span>
+              <button class="chip-btn agg-btn active" data-agg="monthly">Mensal</button>
+              <button class="chip-btn agg-btn" data-agg="weekly">Semanal</button>
+              <button class="chip-btn agg-btn" data-agg="daily">Diário</button>
+            </div>
+          </div>
+
+          <!-- Main Interactive Chart Canvas -->
+          <div class="glass-panel chart-wrapper">
+            <div class="chart-container-inner" style="height: 440px; position: relative;">
+              <canvas id="studio-canvas-chart"></canvas>
+              <div id="studio-heatmap-container" style="display: none; height: 100%; width: 100%; overflow-y: auto;"></div>
+            </div>
+          </div>
+
+          <!-- Station Comparison Matrix Table -->
+          <div class="glass-panel" style="padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h4 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;">
+                  Matriz Comparativa das Estações Selecionadas
+                </h4>
+                <p style="font-size: 0.72rem; color: var(--text-muted);">
+                  Desempenho detalhado, média em dias úteis versus fins de semana e perfil de deslocamento.
+                </p>
+              </div>
+            </div>
+
+            <div id="studio-comparison-table-wrapper" class="table-responsive">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </section>
+
+  </main>
+    </div> <!-- /.main-viewport -->
+  </div> <!-- /.app-shell -->
+
+  <!-- Pre-loaded Data -->
+  <script src="data/rail_data.js"></script>
+  <!-- High Performance Analytics Cache & Map Engine -->
+  <script src="js/analytics-cache.js"></script>
+  <script src="js/map-engine.js"></script>
+  <!-- Application Logic -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>

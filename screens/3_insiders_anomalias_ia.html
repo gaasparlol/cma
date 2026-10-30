@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RailPulse - Central de Insiders &amp; Detecção de Anomalias IA</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary": "#00354a",
+            "surface-container-high": "#262a35",
+            "tertiary-fixed-dim": "#7bd0ff",
+            "surface-dim": "#0f131d",
+            "outline": "#86948a",
+            "on-secondary-fixed-variant": "#004e5c",
+            "on-surface-variant": "#bbcabf",
+            "inverse-on-surface": "#2c303b",
+            "on-background": "#dfe2f1",
+            "on-tertiary-container": "#003e55",
+            "on-primary-fixed-variant": "#005236",
+            "primary-fixed": "#6ffbbe",
+            "on-secondary-fixed": "#001f26",
+            "surface-bright": "#353944",
+            "on-tertiary-fixed-variant": "#004c69",
+            "on-primary": "#003824",
+            "inverse-primary": "#006c49",
+            "surface-container-highest": "#313540",
+            "on-tertiary-fixed": "#001e2c",
+            "background": "#0f131d",
+            "tertiary": "#7bd0ff",
+            "surface-container-low": "#171b26",
+            "on-surface": "#dfe2f1",
+            "error-container": "#93000a",
+            "on-primary-container": "#00422b",
+            "surface-tint": "#4edea3",
+            "primary-fixed-dim": "#4edea3",
+            "surface-container-lowest": "#0a0e18",
+            "on-error": "#690005",
+            "outline-variant": "#3c4a42",
+            "tertiary-fixed": "#c4e7ff",
+            "primary": "#4edea3",
+            "error": "#ffb4ab",
+            "on-primary-fixed": "#002113",
+            "secondary-fixed": "#acedff",
+            "surface": "#0f131d",
+            "on-secondary": "#003640",
+            "on-error-container": "#ffdad6",
+            "surface-variant": "#313540",
+            "secondary": "#4cd7f6",
+            "tertiary-container": "#19aee8",
+            "surface-container": "#1c1f2a",
+            "primary-container": "#10b981",
+            "on-secondary-container": "#00424e",
+            "inverse-surface": "#dfe2f1",
+            "secondary-fixed-dim": "#4cd7f6",
+            "secondary-container": "#03b5d3"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "margin": "1rem",
+            "space-2xl": "3rem",
+            "space-lg": "1.5rem",
+            "gutter-desktop": "1.5rem",
+            "margin-desktop": "2rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "telemetry-mono": ["Inter"],
+            "label-sm": ["Inter"],
+            "metric-display": ["Plus Jakarta Sans"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "body-lg": ["Inter"]
+          },
+          "fontSize": {
+            "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "telemetry-mono": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0a0e18;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1c1f2a;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #313540;
+    }
+    .glow-line9 {
+      box-shadow: 0 0 20px -4px rgba(16, 185, 129, 0.25);
+    }
+    .glow-line8 {
+      box-shadow: 0 0 20px -4px rgba(6, 182, 212, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary">
+<!-- TOP NAVIGATION BAR (Based on Shared Components JSON) -->
+<header class="bg-surface-container-low/80 dark:bg-surface-container-lowest/90 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center w-full px-space-xl h-16 border-b border-outline-variant/30 shadow-sm backdrop-blur-xl">
+<!-- Brand / Wordmark -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="hub">hub</span>
+<span class="text-headline-md font-headline-md font-bold text-on-surface tracking-tight">RailPulse</span>
+</div>
+<div class="h-5 w-px bg-outline-variant/50 hidden md:block"></div>
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm bg-surface-container-high/80 text-on-surface-variant px-2.5 py-0.5 rounded border border-outline-variant/40 tracking-wider">
+          VIAMOBILIDADE • LINHA 8 DIAMANTE &amp; LINHA 9 ESMERALDA
+        </span>
+<span class="text-label-sm font-label-sm text-primary font-telemetry-mono bg-primary-container/20 px-1.5 py-0.5 rounded border border-primary/30">
+          V3.8 RT
+        </span>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="hidden lg:flex items-center gap-6 h-full">
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md flex items-center gap-1.5" href="#">
+<span class="text-on-surface-variant/70">1.</span> Visão Geral Executiva
+      </a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md flex items-center gap-1.5" href="#">
+<span class="text-on-surface-variant/70">2.</span> Estúdio Dinâmico de Gráficos
+      </a>
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary font-semibold py-3 transition-colors text-label-md font-label-md flex items-center gap-1.5 relative" href="#">
+<span class="text-primary font-bold">3.</span> Insiders &amp; Anomalias IA
+        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse absolute -right-2 top-3"></span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md flex items-center gap-1.5" href="#">
+<span class="text-on-surface-variant/70">4.</span> Simulador Tarifário
+      </a>
+</nav>
+<!-- Status & Secondary Utility cluster -->
+<div class="flex items-center gap-3">
+<div class="hidden xl:flex items-center gap-2 bg-surface-container-lowest/80 px-3 py-1.5 rounded border border-outline-variant/40">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-label-sm font-telemetry-mono text-on-surface">Motor de IA Analítico Ativo</span>
+<span class="text-label-sm font-label-sm text-outline">•</span>
+<span class="text-label-sm font-telemetry-mono text-secondary">MD.xlsx (1.678 dias)</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-all" title="Filtro Temporal">
+<span class="material-symbols-outlined text-[20px]" data-icon="tune">tune</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-all relative" title="Notificações NOC">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-all" title="Ajuda NOC">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+</button>
+</div>
+<div class="h-6 w-px bg-outline-variant/40"></div>
+<div class="flex items-center gap-2.5 pl-1">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-primary/40 flex items-center justify-center text-primary text-xs font-headline-sm font-bold">
+          CC
+        </div>
+<div class="hidden md:flex flex-col text-left">
+<span class="text-label-sm font-label-sm text-on-surface">C. Carvalheiro</span>
+<span class="text-[10px] font-telemetry-mono text-outline">Operador NOC #284</span>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN VIEWPORT CONTAINER -->
+<main class="flex-1 flex flex-col w-full max-w-[1920px] mx-auto px-space-md lg:px-space-xl py-space-md gap-y-space-md">
+<!-- TOP KPI SUMMARY: MOTOR DE DETECÇÃO DE ANOMALIAS -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Card 1: Alertas Ativos -->
+<div class="bg-surface-container-low/70 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-md flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/70 transition-all">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-error"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-error" data-icon="warning">warning</span>
+            Alertas Ativos
+          </span>
+<span class="text-label-sm font-telemetry-mono text-error bg-error/10 border border-error/30 px-2 py-0.5 rounded">Tempo Real</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-on-surface tracking-tight">18</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">detectados</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 flex-wrap pt-1 border-t border-outline-variant/20">
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-error/15 text-error border border-error/30 font-semibold">4 Críticos</span>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">8 Moderados</span>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-secondary/15 text-secondary border border-secondary/30">6 Informativos</span>
+</div>
+</div>
+<!-- Card 2: Desvio Médio Padrão (FDS vs Útil) -->
+<div class="bg-surface-container-low/70 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-md flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/70 transition-all">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-secondary"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-secondary" data-icon="stacked_line_chart">stacked_line_chart</span>
+            Desvio Médio Padrão (FDS vs Útil)
+          </span>
+<span class="material-symbols-outlined text-on-surface-variant text-base" data-icon="info">info</span>
+</div>
+<div class="my-2 flex items-center justify-between">
+<div>
+<div class="flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-secondary tracking-tight font-telemetry-mono">-56.3%</span>
+</div>
+<span class="text-body-sm font-body-sm text-outline">Queda sazonal de fim de semana</span>
+</div>
+<!-- Sparkline SVG -->
+<div class="w-24 h-10">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 100 35">
+<defs>
+<lineargradient id="spark-grad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#38bdf8" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M 0,5 Q 25,6 40,8 T 70,30 L 100,32" fill="none" stroke="#38bdf8" stroke-linecap="round" stroke-width="2"></path>
+<path d="M 0,5 Q 25,6 40,8 T 70,30 L 100,32 L 100,35 L 0,35 Z" fill="url(#spark-grad)"></path>
+</svg>
+</div>
+</div>
+<div class="pt-1 border-t border-outline-variant/20">
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/40">
+            Assimetria Típica de Malha
+          </span>
+</div>
+</div>
+<!-- Card 3: Maior Volatilidade Histórica -->
+<div class="bg-surface-container-low/70 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-md flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/70 transition-all glow-line9">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-primary"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-primary" data-icon="electric_meter">electric_meter</span>
+            Maior Volatilidade Histórica
+          </span>
+<span class="text-label-sm font-telemetry-mono text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded">CV: 48.2%</span>
+</div>
+<div class="my-2">
+<div class="text-headline-md font-headline-md text-on-surface font-bold tracking-tight truncate">
+            Autódromo / Interlagos (L9)
+          </div>
+<span class="text-body-sm font-body-sm text-outline">Desvio padrão máximo: ±41.4k pass/evento</span>
+</div>
+<div class="pt-1 border-t border-outline-variant/20 flex items-center justify-between">
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-primary-container/20 text-primary border border-primary/40 font-semibold">
+            Suscetível a Megaeventos
+          </span>
+<span class="text-label-sm font-telemetry-mono text-on-surface-variant">Linha 9 • Esmeralda</span>
+</div>
+</div>
+<!-- Card 4: Acurácia do Padrão Sazonal -->
+<div class="bg-surface-container-low/70 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-md flex flex-col justify-between relative overflow-hidden group hover:border-outline-variant/70 transition-all">
+<div class="absolute top-0 left-0 right-0 h-[2px] bg-primary"></div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-primary" data-icon="model_training">model_training</span>
+            Acurácia do Padrão Sazonal
+          </span>
+<span class="text-label-sm font-telemetry-mono text-secondary bg-secondary/10 border border-secondary/30 px-2 py-0.5 rounded">R² = 0.962</span>
+</div>
+<div class="my-2">
+<div class="flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-primary tracking-tight font-telemetry-mono">97.4%</span>
+<span class="text-body-sm font-body-sm text-outline">fidelidade preditiva</span>
+</div>
+</div>
+<div class="pt-1 border-t border-outline-variant/20">
+<span class="text-label-sm font-label-sm text-on-surface-variant truncate block" title="Modelo Prophet &amp; Isolation Forest">
+            Modelo Prophet &amp; Isolation Forest
+          </span>
+</div>
+</div>
+</section>
+<!-- MAIN TWO-COLUMN DASHBOARD GRID -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start flex-1">
+<!-- LEFT COLUMN (7 / 12) - FEED DE INSIDERS & DETECÇÃO DE EVENTOS -->
+<section class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Controls bar -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-surface-container-low/50 backdrop-blur-sm p-space-md rounded-xl border border-outline-variant/30">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="radar">radar</span>
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-bold">Feed de Insiders &amp; Detecção de Eventos</h2>
+<span class="text-label-sm font-telemetry-mono bg-surface-container-high px-2 py-0.5 rounded text-on-surface-variant">3 Destaques</span>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+<!-- Filter Dropdown / chips -->
+<div class="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded border border-outline-variant/40 text-label-sm">
+<span class="text-outline">Severidade:</span>
+<select class="bg-transparent border-0 text-on-surface font-semibold focus:ring-0 p-0 text-label-sm cursor-pointer">
+<option value="all">Todas as ocorrências</option>
+<option value="crit">Críticos apenas</option>
+<option value="mod">Moderados &amp; Críticos</option>
+</select>
+</div>
+<button class="flex items-center gap-1 bg-surface-container hover:bg-surface-container-high px-2.5 py-1 rounded border border-outline-variant/40 text-label-sm font-label-sm text-on-surface transition-colors" title="Ordenar por Impacto">
+<span class="material-symbols-outlined text-sm" data-icon="swap_vert">swap_vert</span>
+<span>Impacto Temporal</span>
+</button>
+</div>
+</div>
+<!-- INSIDER CARD 1: Pico Anômalo Confirmado (Autódromo / Interlagos) -->
+<article class="bg-surface-container-low/80 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-lg relative overflow-hidden transition-all duration-200 hover:border-error/50 group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-error"></div>
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="flex items-center gap-1 bg-error/20 text-error border border-error/40 px-2.5 py-1 rounded text-label-sm font-label-sm font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm animate-pulse" data-icon="crisis_alert">crisis_alert</span>
+                PICO ANÔMALO CONFIRMADO
+              </span>
+<span class="text-label-sm font-label-sm bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Linha 9 • Esmeralda
+              </span>
+</div>
+<span class="text-label-sm font-telemetry-mono text-outline">Detecção: Ontem às 22h40 (NOC IA)</span>
+</div>
+<div class="mb-3">
+<h3 class="text-headline-md font-headline-md text-on-surface font-bold">
+              Estação Autódromo &amp; Primavera-Interlagos
+            </h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+              Desvio volumétrico agudo em razão de grande festival / corrida de automobilismo (The Town / F1 GP Brasil). Curva extrapola o limiar de 3.2 desvios padrão da normalidade.
+            </p>
+</div>
+<!-- Comparative Mini-Chart Visual (Normal vs Anomaly) -->
+<div class="bg-surface-container-lowest/90 rounded-lg p-3 border border-outline-variant/30 my-3">
+<div class="flex items-center justify-between mb-2 text-label-sm">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-telemetry-mono">
+<span class="w-3 h-0.5 bg-outline rounded"></span> Normal FDS: <strong class="text-on-surface">27.3k</strong>
+</div>
+<div class="flex items-center gap-1.5 text-error font-telemetry-mono font-bold">
+<span class="w-3 h-1 bg-error rounded"></span> Evento F1 / Festival: <strong class="text-error">78.1k</strong>
+</div>
+</div>
+<span class="text-error font-telemetry-mono font-bold bg-error/15 px-2 py-0.5 rounded border border-error/30">
+                +185.7% de volume
+              </span>
+</div>
+<!-- Stylized Curve SVG -->
+<div class="w-full h-24 relative">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 600 90">
+<!-- Background grid lines -->
+<line stroke="#1e293b" stroke-dasharray="3 3" x1="0" x2="600" y1="20" y2="20"></line>
+<line stroke="#1e293b" stroke-dasharray="3 3" x1="0" x2="600" y1="50" y2="50"></line>
+<line stroke="#1e293b" stroke-dasharray="3 3" x1="0" x2="600" y1="75" y2="75"></line>
+<!-- Normal Curve (Faint/Dashed) -->
+<path d="M 0,80 C 120,78 180,68 250,65 C 320,62 400,68 480,72 L 600,80" fill="none" stroke="#64748b" stroke-dasharray="4 4" stroke-width="2"></path>
+<!-- Surge Curve (Vibrant Ruby/Cyan) -->
+<defs>
+<lineargradient id="surgeGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ef4444" stop-opacity="0.45"></stop>
+<stop offset="80%" stop-color="#ef4444" stop-opacity="0.02"></stop>
+</lineargradient>
+</defs>
+<path d="M 0,80 C 120,78 160,50 250,22 C 320,5 370,12 430,28 C 490,45 540,70 600,78 L 600,90 L 0,90 Z" fill="url(#surgeGradient)"></path>
+<path d="M 0,80 C 120,78 160,50 250,22 C 320,5 370,12 430,28 C 490,45 540,70 600,78" fill="none" stroke="#ef4444" stroke-width="2.5"></path>
+<!-- Peak marker point -->
+<circle cx="320" cy="5" fill="#ef4444" r="4" stroke="#ffffff" stroke-width="1.5"></circle>
+<text fill="#ffb4ab" font-family="Inter" font-size="11" font-weight="600" x="330" y="14">Pico: 78.140 pass.</text>
+</svg>
+</div>
+</div>
+<!-- AI Insight Box -->
+<div class="bg-surface-container/60 rounded-lg p-3 border-l-2 border-primary mb-4 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5" data-icon="psychology">psychology</span>
+<div class="text-body-sm font-body-sm text-on-surface">
+<span class="font-semibold text-primary">Insight IA (Prophet &amp; Isolation Forest):</span>
+              Fórmula 1 e Festivais geram sobrecarga imediata em Autódromo e Primavera-Interlagos; necessária ampliação de composições e intervalos de 3min no trecho Jurubatuba - Grajaú para evitar esgotamento de plataforma.
+            </div>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/30">
+<div class="flex items-center gap-2">
+<button class="bg-primary text-on-primary hover:bg-primary-fixed px-3 py-1.5 rounded-lg text-label-md font-label-md font-bold flex items-center gap-1.5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-base" data-icon="alt_route">alt_route</span>
+                Simular Grade Extra
+              </button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface px-3 py-1.5 rounded-lg text-label-md font-label-md border border-outline-variant/40 transition-all">
+                Ver Histórico de Edições
+              </button>
+</div>
+<span class="text-label-sm font-telemetry-mono text-outline">Severidade: 0.94</span>
+</div>
+</article>
+<!-- INSIDER CARD 2: Padrão Estrutural Corporativo (Faria Lima & Berrini) -->
+<article class="bg-surface-container-low/80 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-lg relative overflow-hidden transition-all duration-200 hover:border-primary/50 group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="flex items-center gap-1 bg-primary/20 text-primary border border-primary/40 px-2.5 py-1 rounded text-label-sm font-label-sm font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm" data-icon="sync_alt">sync_alt</span>
+                COMPORTAMENTO PENDULAR PREDITIVO
+              </span>
+<span class="text-label-sm font-label-sm bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Linha 9 • Esmeralda
+              </span>
+</div>
+<span class="text-label-sm font-telemetry-mono text-outline">Sazonalidade 5x2 Consistente</span>
+</div>
+<div class="mb-3">
+<h3 class="text-headline-md font-headline-md text-on-surface font-bold">
+              Eixo Corporativo: Berrini, Vila Olímpia &amp; Cidade Jardim
+            </h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+              Alta sensibilidade ao teletrabalho híbrido (segundas e sextas com -14% de embarques em relação a quartas). Queda extrema e previsível nos sábados e domingos.
+            </p>
+</div>
+<!-- Comparative Stat Bars -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-surface-container-lowest/90 rounded-lg p-3 border border-outline-variant/30 my-3">
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-outline">Dias Úteis (Média Ter-Qui)</span>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface font-telemetry-mono">41.200</span>
+<span class="text-label-sm font-body-sm text-outline">passageiros/dia</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded mt-2 overflow-hidden">
+<div class="bg-primary h-full rounded" style="width: 88%;"></div>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-outline">Fins de Semana &amp; Feriados</span>
+<div class="flex items-baseline gap-2 mt-0.5">
+<span class="text-headline-sm font-headline-sm font-bold text-secondary font-telemetry-mono">14.500</span>
+<span class="text-label-sm font-telemetry-mono text-error font-semibold">-65.0% queda</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded mt-2 overflow-hidden">
+<div class="bg-secondary h-full rounded" style="width: 31%;"></div>
+</div>
+</div>
+</div>
+<!-- AI Insight Box -->
+<div class="bg-surface-container/60 rounded-lg p-3 border-l-2 border-secondary mb-4 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-secondary text-lg mt-0.5" data-icon="tips_and_updates">tips_and_updates</span>
+<div class="text-body-sm font-body-sm text-on-surface">
+<span class="font-semibold text-secondary">Insight Operacional:</span>
+              Oportunidade de otimização de oferta energética e redução de frota aos domingos no trecho Pinheiros - Morumbi, gerando economia estimada de R$ 142k/mês em tração elétrica sem afetar a nota de conforto dos usuários.
+            </div>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-between pt-2 border-t border-outline-variant/30">
+<div class="flex items-center gap-2">
+<button class="bg-secondary text-on-secondary hover:bg-secondary-fixed px-3 py-1.5 rounded-lg text-label-md font-label-md font-bold flex items-center gap-1.5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-base" data-icon="schedule">schedule</span>
+                Ajustar Headway
+              </button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface px-3 py-1.5 rounded-lg text-label-md font-label-md border border-outline-variant/40 transition-all">
+                Exportar Relatório Energético
+              </button>
+</div>
+<span class="text-label-sm font-telemetry-mono text-outline">Previsibilidade: 98.1%</span>
+</div>
+</article>
+<!-- INSIDER CARD 3: Detecção de Inversão de Fluxo (Barueri & Barra Funda L8) -->
+<article class="bg-surface-container-low/80 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-lg relative overflow-hidden transition-all duration-200 hover:border-secondary/50 group glow-line8">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="flex items-center gap-1 bg-secondary/20 text-secondary border border-secondary/40 px-2.5 py-1 rounded text-label-sm font-label-sm font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                CRESCIMENTO DE DEMANDA CONSOLIDADO
+              </span>
+<span class="text-label-sm font-label-sm bg-secondary/10 text-secondary border border-secondary/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Linha 8 • Diamante
+              </span>
+</div>
+<span class="text-label-sm font-telemetry-mono text-primary font-bold">+16.4% YoY</span>
+</div>
+<div class="mb-3">
+<h3 class="text-headline-md font-headline-md text-on-surface font-bold">
+              Corredor Barueri, Carapicuíba &amp; Conexão Barra Funda
+            </h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+              Migração residencial pós-pandemia e adensamento em Alphaville geram contrafluxo matutino crescente no sentido Barra Funda → Itapevi (+21% entre 07h e 09h).
+            </p>
+</div>
+<div class="bg-surface-container-lowest/90 rounded-lg p-3 border border-outline-variant/30 flex items-center justify-between">
+<div class="flex items-center gap-4 text-label-sm">
+<div>
+<span class="text-outline block">Volume 2023</span>
+<span class="text-body-lg font-headline-sm font-bold text-on-surface font-telemetry-mono">48.9k / dia</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="arrow_forward">arrow_forward</span>
+<div>
+<span class="text-outline block">Volume 2024 (Atual)</span>
+<span class="text-body-lg font-headline-sm font-bold text-secondary font-telemetry-mono">56.9k / dia</span>
+</div>
+</div>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface px-3 py-1.5 rounded-lg text-label-md font-label-md border border-outline-variant/40 flex items-center gap-1 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="map">map</span>
+              Ver Mapeamento O/D
+            </button>
+</div>
+</article>
+</section>
+<!-- RIGHT COLUMN (5 / 12) - DISPERSÃO DE DEMANDA & CALIBRAÇÃO IA -->
+<section class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- SCATTER PLOT INTERACTIVE CARD -->
+<div class="bg-surface-container-low/80 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-lg relative overflow-hidden flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface">Dispersão: Volume x Receita</h2>
+<p class="text-body-sm font-body-sm text-outline">Análise das 44 estações operadas por cluster</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="flex items-center gap-1 text-[11px] font-telemetry-mono text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> L8 Diamante
+              </span>
+<span class="flex items-center gap-1 text-[11px] font-telemetry-mono text-primary">
+<span class="w-2 h-2 rounded-full bg-primary"></span> L9 Esmeralda
+              </span>
+</div>
+</div>
+<!-- Scatter Plot Canvas Container (SVG Native Data Visualization) -->
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-outline-variant/40 relative">
+<div class="flex justify-between text-[10px] font-telemetry-mono text-outline mb-1">
+<span>Eixo Y: Receita Diária (R$ k)</span>
+<span>R² = 0.914 (Correlação Linear)</span>
+</div>
+<!-- SVG Scatter Plot -->
+<div class="w-full h-64 relative">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 400 240">
+<!-- Grid background -->
+<line stroke="#1c2438" stroke-dasharray="2 2" stroke-width="1" x1="40" x2="380" y1="20" y2="20"></line>
+<line stroke="#1c2438" stroke-dasharray="2 2" stroke-width="1" x1="40" x2="380" y1="70" y2="70"></line>
+<line stroke="#1c2438" stroke-dasharray="2 2" stroke-width="1" x1="40" x2="380" y1="120" y2="120"></line>
+<line stroke="#1c2438" stroke-dasharray="2 2" stroke-width="1" x1="40" x2="380" y1="170" y2="170"></line>
+<line stroke="#334155" stroke-width="1.5" x1="40" x2="380" y1="210" y2="210"></line>
+<line stroke="#334155" stroke-width="1.5" x1="40" x2="40" y1="10" y2="210"></line>
+<!-- Labels Eixo Y -->
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="end" x="32" y="24">250k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="end" x="32" y="74">180k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="end" x="32" y="124">120k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="end" x="32" y="174">60k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="end" x="32" y="214">0k</text>
+<!-- Labels Eixo X -->
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="middle" x="40" y="226">0</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="middle" x="120" y="226">12k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="middle" x="200" y="226">25k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="middle" x="290" y="226">38k</text>
+<text fill="#94a3b8" font-family="Inter" font-size="9" text-anchor="middle" x="375" y="226">50k</text>
+<!-- Regression Line -->
+<line opacity="0.6" stroke="#38bdf8" stroke-dasharray="4 4" stroke-width="1.5" x1="45" x2="375" y1="205" y2="35"></line>
+<!-- Scatter Points - Linha 8 (Ciano #4cd7f6 / #06b6d4) -->
+<circle cx="360" cy="42" fill="#4cd7f6" fill-opacity="0.8" r="6" stroke="#ffffff" stroke-width="1"></circle> <!-- Barra Funda -->
+<circle cx="310" cy="72" fill="#4cd7f6" fill-opacity="0.7" r="5"></circle> <!-- Osasco -->
+<circle cx="280" cy="85" fill="#4cd7f6" fill-opacity="0.7" r="4.5"></circle> <!-- Barueri -->
+<circle cx="240" cy="115" fill="#4cd7f6" fill-opacity="0.7" r="4"></circle> <!-- Carapicuíba -->
+<circle cx="190" cy="135" fill="#4cd7f6" fill-opacity="0.7" r="3.5"></circle> <!-- Jandira -->
+<circle cx="150" cy="155" fill="#4cd7f6" fill-opacity="0.7" r="3.5"></circle> <!-- Itapevi -->
+<circle cx="110" cy="175" fill="#4cd7f6" fill-opacity="0.7" r="3"></circle>
+<circle cx="85" cy="185" fill="#4cd7f6" fill-opacity="0.7" r="3"></circle>
+<circle cx="70" cy="192" fill="#4cd7f6" fill-opacity="0.7" r="3"></circle>
+<!-- Scatter Points - Linha 9 (Esmeralda #4edea3 / #10b981) -->
+<circle cx="355" cy="48" fill="#4edea3" fill-opacity="0.85" r="6.5" stroke="#ffffff" stroke-width="1"></circle> <!-- Pinheiros -->
+<circle cx="325" cy="60" fill="#4edea3" fill-opacity="0.8" r="5.5" stroke="#4edea3" stroke-width="2"></circle> <!-- Santo Amaro -->
+<circle cx="300" cy="65" fill="#4edea3" fill-opacity="0.8" r="5"></circle> <!-- Vila Olímpia -->
+<circle cx="270" cy="90" fill="#4edea3" fill-opacity="0.8" r="4.5"></circle> <!-- Berrini -->
+<circle cx="255" cy="100" fill="#4edea3" fill-opacity="0.8" r="4.5"></circle> <!-- Morumbi -->
+<circle cx="225" cy="120" fill="#4edea3" fill-opacity="0.8" r="4"></circle> <!-- Cidade Universitária -->
+<circle cx="180" cy="140" fill="#4edea3" fill-opacity="0.8" r="4"></circle> <!-- Autódromo -->
+<circle cx="160" cy="152" fill="#4edea3" fill-opacity="0.8" r="3.5"></circle> <!-- Grajaú -->
+<circle cx="130" cy="165" fill="#4edea3" fill-opacity="0.8" r="3.5"></circle> <!-- Mendes-Vila Natal -->
+<circle cx="95" cy="180" fill="#4edea3" fill-opacity="0.8" r="3"></circle>
+<circle cx="78" cy="190" fill="#4edea3" fill-opacity="0.8" r="3"></circle>
+<!-- Interactive Callout Tooltip: Pinheiros L9 -->
+<g transform="translate(230, 25)">
+<rect fill="#171b26" height="34" rx="4" stroke="#4edea3" stroke-width="1" width="125"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="10" font-weight="700" x="8" y="14">Pinheiros (L9)</text>
+<text fill="#4edea3" font-family="Inter" font-size="9" x="8" y="27">46.8k pass • R$ 238k/dia</text>
+</g>
+<line stroke="#4edea3" stroke-width="1" x1="355" x2="330" y1="48" y2="40"></line>
+<!-- Interactive Callout: Barra Funda L8 -->
+<g transform="translate(235, 120)">
+<rect fill="#171b26" height="34" rx="4" stroke="#4cd7f6" stroke-width="1" width="130"></rect>
+<text fill="#ffffff" font-family="Inter" font-size="10" font-weight="700" x="8" y="14">Barra Funda (L8)</text>
+<text fill="#4cd7f6" font-family="Inter" font-size="9" x="8" y="27">48.2k pass • R$ 242k/dia</text>
+</g>
+</svg>
+</div>
+<!-- X Axis Title -->
+<div class="text-center text-[10px] font-telemetry-mono text-outline mt-2">
+              Eixo X: Volume Médio de Passageiros Transportados / Dia
+            </div>
+</div>
+<!-- Scatter Insight Pill -->
+<div class="flex items-center justify-between text-label-sm bg-surface-container/60 p-2.5 rounded border border-outline-variant/30">
+<span class="text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-base" data-icon="check_circle">check_circle</span>
+              Cluster Superavitário: <strong>14 estações</strong> concentram 68% da receita tarifária.
+            </span>
+</div>
+</div>
+<!-- PAINEL DE CONFIGURAÇÃO DE SENSIBILIDADE DO MOTOR IA -->
+<div class="bg-surface-container-low/80 backdrop-blur-md border border-outline-variant/30 rounded-xl p-space-lg flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="tune">tune</span>
+<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">Calibração do Motor IA</h3>
+</div>
+<span class="text-label-sm font-telemetry-mono text-outline">Modelo Isolation Forest v2.4</span>
+</div>
+<!-- Sensibilidade Slider Control -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="text-label-md font-label-md text-on-surface">Sensibilidade de Detecção (Threshold):</label>
+<span class="text-label-md font-telemetry-mono text-primary font-bold bg-primary/10 px-2 py-0.5 rounded border border-primary/30">
+                2.0σ (Desvio Padrão)
+              </span>
+</div>
+<input class="w-full accent-primary bg-surface-container-highest h-2 rounded-lg cursor-pointer" max="3.5" min="1.0" step="0.1" type="range" value="2.0"/>
+<div class="flex justify-between text-[11px] font-telemetry-mono text-outline mt-1">
+<span>1.0σ (Ultra Sensível • +Ruído)</span>
+<span>2.0σ (Recomendado)</span>
+<span>3.5σ (Apenas Críticos)</span>
+</div>
+</div>
+<!-- Filtro por Tipo de Anomalia (Chips) -->
+<div>
+<label class="text-label-sm font-label-sm text-outline block mb-2">Filtro por Tipo de Anomalia:</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-2.5 py-1 rounded bg-primary-container text-on-primary text-label-sm font-label-sm font-bold shadow-sm transition-all">
+                Todos (18)
+              </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/30 transition-all">
+                Megaeventos (5)
+              </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/30 transition-all">
+                Evasão FDS (7)
+              </button>
+<button class="px-2.5 py-1 rounded bg-surface-container-high hover:bg-surface-bright text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/30 transition-all">
+                Receita &amp; Evasão (6)
+              </button>
+</div>
+</div>
+<!-- Primary & Secondary Action Buttons -->
+<div class="flex flex-col gap-2 pt-2 border-t border-outline-variant/30">
+<button class="w-full bg-primary hover:bg-primary-fixed text-on-primary py-2.5 px-4 rounded-lg font-headline-sm font-bold text-headline-sm flex items-center justify-center gap-2 transition-all duration-150 active:scale-[0.98] shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-xl" data-icon="description">description</span>
+              Gerar Dossiê de Inteligência em PDF / XLSX
+            </button>
+<button class="w-full bg-surface-container-high hover:bg-surface-bright text-on-surface py-2 px-4 rounded-lg font-label-md text-label-md border border-outline-variant/40 flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="refresh">refresh</span>
+              Reprocessar Heurísticas
+            </button>
+</div>
+</div>
+</section>
+</div>
+<!-- RODAPÉ DE TELEMETRIA OPERACIONAL -->
+<footer class="mt-auto bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-space-md flex flex-wrap items-center justify-between gap-4 text-label-sm font-telemetry-mono">
+<div class="flex items-center gap-4 flex-wrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-on-surface font-semibold">Linha 9 Esmeralda:</span>
+<span class="text-primary font-bold">98.4% Regularidade</span>
+<span class="text-outline">(34 trens em via)</span>
+</div>
+<div class="h-4 w-px bg-outline-variant/40 hidden sm:block"></div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-on-surface font-semibold">Linha 8 Diamante:</span>
+<span class="text-secondary font-bold">97.8% Regularidade</span>
+<span class="text-outline">(38 trens em via)</span>
+</div>
+<div class="h-4 w-px bg-outline-variant/40 hidden sm:block"></div>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-base" data-icon="database">database</span>
+<span>Latência Telemetria: 42ms</span>
+</div>
+</div>
+<div class="flex items-center gap-3 text-outline">
+<span>ViaMobilidade Gestão de Arrecadação</span>
+<span>•</span>
+<span>Atualizado às 14:38:05 BRT</span>
+</div>
+</footer>
+</main>
+</body></html>

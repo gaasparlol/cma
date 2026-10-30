@@ -1,0 +1,15 @@
+# Dependencies & Environments
+node_modules/
+.env
+*.env
+
+# Local agent & temporary tools
+.agents/
+temp_antigravity_skills/
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

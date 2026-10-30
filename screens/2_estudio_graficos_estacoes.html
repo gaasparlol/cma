@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RailPulse - Estúdio Dinâmico de Gráficos e Estações | ViaMobilidade</title>
+<!-- Google Fonts: Inter & Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms & Container Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim from Design System -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-low": "#171b26",
+            "tertiary-fixed-dim": "#7bd0ff",
+            "inverse-on-surface": "#2c303b",
+            "surface-dim": "#0f131d",
+            "primary-fixed": "#6ffbbe",
+            "surface-container": "#1c1f2a",
+            "surface-container-highest": "#313540",
+            "primary-container": "#10b981",
+            "tertiary": "#7bd0ff",
+            "background": "#0f131d",
+            "on-secondary-container": "#00424e",
+            "on-error-container": "#ffdad6",
+            "error-container": "#93000a",
+            "surface-bright": "#353944",
+            "primary": "#4edea3",
+            "tertiary-fixed": "#c4e7ff",
+            "surface-variant": "#313540",
+            "on-secondary-fixed": "#001f26",
+            "inverse-primary": "#006c49",
+            "surface-container-lowest": "#0a0e18",
+            "on-primary": "#003824",
+            "outline": "#86948a",
+            "on-tertiary-fixed-variant": "#004c69",
+            "secondary-container": "#03b5d3",
+            "on-primary-fixed": "#002113",
+            "inverse-surface": "#dfe2f1",
+            "surface-container-high": "#262a35",
+            "on-background": "#dfe2f1",
+            "secondary": "#4cd7f6",
+            "primary-fixed-dim": "#4edea3",
+            "surface-tint": "#4edea3",
+            "on-error": "#690005",
+            "secondary-fixed-dim": "#4cd7f6",
+            "on-primary-container": "#00422b",
+            "surface": "#0f131d",
+            "on-primary-fixed-variant": "#005236",
+            "error": "#ffb4ab",
+            "on-secondary": "#003640",
+            "tertiary-container": "#19aee8",
+            "on-tertiary-container": "#003e55",
+            "on-surface-variant": "#bbcabf",
+            "on-surface": "#dfe2f1",
+            "secondary-fixed": "#acedff",
+            "on-tertiary-fixed": "#001e2c",
+            "on-secondary-fixed-variant": "#004e5c",
+            "on-tertiary": "#00354a",
+            "outline-variant": "#3c4a42"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "space-xl": "2rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-md": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "metric-display": ["Plus Jakarta Sans"],
+            "telemetry-mono": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "telemetry-mono": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Custom subtle grid canvas texture */
+    .bg-radar-grid {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0f131d;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #262a35;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #3c4a42;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased font-body-md selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col bg-radar-grid">
+<!-- TOP APP / NAVIGATION BAR (Shared Component Anchor) -->
+<header class="bg-surface-container-low/80 dark:bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/30 sticky top-0 z-50 shadow-sm backdrop-blur-xl">
+<div class="max-w-[1920px] mx-auto px-space-md lg:px-space-xl h-16 flex items-center justify-between gap-4">
+<!-- Brand & Corridors Identification -->
+<div class="flex items-center gap-6 shrink-0">
+<a class="flex items-center gap-3 group" href="#">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-br from-surface-container-high to-surface-container-lowest border border-outline-variant/50 flex items-center justify-center p-1.5 shadow-inner">
+<!-- Train Pulse Vector SVG -->
+<svg class="w-full h-full text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<rect height="16" rx="2" width="16" x="4" y="3"></rect>
+<path d="M4 11h16"></path>
+<path d="M12 3v8"></path>
+<path d="m8 19-2 3"></path>
+<path d="m16 19 2 3"></path>
+<circle cx="8" cy="15" fill="currentColor" r="1"></circle>
+<circle cx="16" cy="15" fill="currentColor" r="1"></circle>
+</svg>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-on-surface">RailPulse</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">v3.8 RT</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1.5">
+<span>VIAMOBILIDADE</span>
+<span class="text-outline">•</span>
+<span class="text-secondary font-medium">LINHA 8 DIAMANTE</span>
+<span class="text-outline">&amp;</span>
+<span class="text-primary font-medium">LINHA 9 ESMERALDA</span>
+</span>
+</div>
+</a>
+<!-- Vertical Separator -->
+<div class="h-8 w-px bg-outline-variant/40 hidden xl:block"></div>
+<!-- Global Module Navigation Tabs -->
+<nav class="hidden lg:flex items-center gap-1 font-label-md text-label-md">
+<a class="text-on-surface-variant hover:text-on-surface py-3 px-3 transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-base">dashboard</span>
+            1. Visão Geral Executiva
+          </a>
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary font-semibold py-3 px-3 transition-colors flex items-center gap-1.5 bg-surface-container/40 rounded-t-lg" href="#">
+<span class="material-symbols-outlined text-base text-primary">analytics</span>
+            2. Estúdio Dinâmico de Gráficos
+          </a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 px-3 transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-base">psychology</span>
+            3. Insiders &amp; Anomalias IA
+          </a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 px-3 transition-colors flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-base">calculate</span>
+            4. Simulador Tarifário
+          </a>
+</nav>
+</div>
+<!-- Top Right Controls & Filters -->
+<div class="flex items-center gap-3">
+<!-- Live Corridor Status Indicator -->
+<div class="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/30 text-label-sm font-label-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-on-surface-variant font-medium">Telemetria Operacional Ativa</span>
+</div>
+<!-- Period Selector Dropdown -->
+<div class="flex items-center bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-2.5 py-1.5 text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-base text-secondary mr-2">calendar_month</span>
+<span class="font-telemetry-mono text-telemetry-mono font-medium">2022 - 2026</span>
+<span class="material-symbols-outlined text-base text-outline ml-1">expand_more</span>
+</div>
+<!-- Day Type Segmented Controls -->
+<div class="hidden sm:flex items-center bg-surface-container-lowest p-1 rounded-xl border border-outline-variant/30 font-label-sm text-label-sm">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface rounded-lg transition-colors">Todos</button>
+<button class="px-2.5 py-1 bg-surface-container-high text-primary font-semibold rounded-lg shadow-sm border border-outline-variant/50">Útil</button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface rounded-lg transition-colors">Fim de Semana</button>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2">
+<button class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright border border-outline-variant/50 font-label-sm text-label-sm text-on-surface transition-all active:scale-95" title="Salvar Visualização">
+<span class="material-symbols-outlined text-base text-tertiary">bookmark_add</span>
+<span>Salvar</span>
+</button>
+<button class="flex items-center justify-center p-2 rounded-xl bg-surface-container-high hover:bg-surface-bright border border-outline-variant/50 text-on-surface transition-all active:scale-95" title="Exportar Gráfico / CSV">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="flex items-center justify-center p-2 rounded-xl bg-surface-container-high hover:bg-surface-bright border border-outline-variant/50 text-on-surface transition-all active:scale-95" title="Compartilhar Dashboard">
+<span class="material-symbols-outlined text-lg">share</span>
+</button>
+<!-- User / Shift Avatar -->
+<div class="h-8 w-8 rounded-full bg-gradient-to-tr from-secondary-container to-primary flex items-center justify-center text-on-primary-container font-headline-sm text-xs font-bold ring-2 ring-outline-variant/50 ml-1">
+            OP
+          </div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN TWO-COLUMN WORKSPACE -->
+<div class="flex-1 flex max-w-[1920px] w-full mx-auto overflow-hidden">
+<!-- LEFT COLUMN: Station & Metric Filter Palette (w-80 / 320px) -->
+<aside class="w-80 shrink-0 bg-surface-container-lowest border-r border-outline-variant/30 flex flex-col h-[calc(100vh-4rem)] sticky top-16 shadow-lg">
+<!-- Filter Header -->
+<div class="p-space-md border-b border-outline-variant/30 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">tune</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Filtro de Estações</h2>
+</div>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-telemetry-mono bg-primary/10 text-primary border border-primary/25 font-medium">
+            9 de 44 ativas
+          </span>
+</div>
+<!-- Search Bar with Icon -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-base text-outline">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-9 pr-3 py-1.5 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary transition-all" placeholder="Filtrar entre as 44 estações..." type="text"/>
+</div>
+<!-- Quick Preset Filter Chips -->
+<div class="flex flex-col gap-1.5 pt-1">
+<span class="text-[10px] font-label-sm uppercase tracking-wider text-outline">Predefinições de Tráfego</span>
+<div class="flex flex-wrap gap-1.5">
+<button class="px-2.5 py-1 rounded-lg text-xs font-label-sm bg-primary/15 border border-primary/40 text-primary font-semibold flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">check</span> Top 5 Volume
+            </button>
+<button class="px-2 py-1 rounded-lg text-xs font-label-sm bg-surface-container-high hover:bg-surface-bright border border-outline-variant/40 text-on-surface-variant hover:text-on-surface transition-colors">
+              Polos Corporativos (L9)
+            </button>
+<button class="px-2 py-1 rounded-lg text-xs font-label-sm bg-surface-container-high hover:bg-surface-bright border border-outline-variant/40 text-on-surface-variant hover:text-on-surface transition-colors">
+              Hubs de Conexão
+            </button>
+<button class="px-2 py-1 rounded-lg text-xs font-label-sm bg-surface-container-high hover:bg-surface-bright border border-outline-variant/40 text-on-surface-variant hover:text-on-surface transition-colors">
+              Extremo Linha 8
+            </button>
+</div>
+</div>
+</div>
+<!-- Station Accordion Multi-select Lists -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-space-md space-y-5">
+<!-- Section: Linha 9 - Esmeralda -->
+<div class="space-y-2">
+<div class="flex items-center justify-between pb-1 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_8px_#10b981]"></span>
+<span class="font-headline-sm text-xs font-bold text-on-surface tracking-wide">Linha 9 • Esmeralda</span>
+</div>
+<span class="text-[10px] font-telemetry-mono text-primary font-medium bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20">
+              5 selecionadas
+            </span>
+</div>
+<div class="space-y-1 pt-1 font-body-sm text-body-sm">
+<!-- Pinheiros -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Pinheiros</span>
+<span class="text-[9px] px-1 rounded bg-secondary/10 text-secondary border border-secondary/20">Hub Metrô</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">48.9k/dia</span>
+</label>
+<!-- Vila Olímpia -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Vila Olímpia</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">41.2k/dia</span>
+</label>
+<!-- Santo Amaro -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Santo Amaro</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">36.8k/dia</span>
+</label>
+<!-- Berrini -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Berrini</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">29.5k/dia</span>
+</label>
+<!-- Morumbi -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-primary transition-colors">Morumbi</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">22.4k/dia</span>
+</label>
+<!-- Grajaú -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group opacity-75">
+<div class="flex items-center gap-2.5">
+<input class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Grajaú</span>
+</div>
+<span class="font-telemetry-mono text-xs text-outline">34.2k/dia</span>
+</label>
+<!-- Cidade Universitária -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group opacity-75">
+<div class="flex items-center gap-2.5">
+<input class="rounded border-outline-variant/60 bg-surface-container text-primary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Cidade Universitária</span>
+</div>
+<span class="font-telemetry-mono text-xs text-outline">16.1k/dia</span>
+</label>
+</div>
+</div>
+<!-- Section: Linha 8 - Diamante -->
+<div class="space-y-2">
+<div class="flex items-center justify-between pb-1 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_#38bdf8]"></span>
+<span class="font-headline-sm text-xs font-bold text-on-surface tracking-wide">Linha 8 • Diamante</span>
+</div>
+<span class="text-[10px] font-telemetry-mono text-secondary font-medium bg-secondary/10 px-1.5 py-0.5 rounded border border-secondary/20">
+              4 selecionadas
+            </span>
+</div>
+<div class="space-y-1 pt-1 font-body-sm text-body-sm">
+<!-- Osasco -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Osasco</span>
+<span class="text-[9px] px-1 rounded bg-tertiary-container/30 text-tertiary border border-tertiary/30">Hub L8/L9</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">42.6k/dia</span>
+</label>
+<!-- Barra Funda -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Barra Funda</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">38.4k/dia</span>
+</label>
+<!-- Barueri -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Barueri</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">32.1k/dia</span>
+</label>
+<!-- Carapicuíba -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group">
+<div class="flex items-center gap-2.5">
+<input checked="" class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Carapicuíba</span>
+</div>
+<span class="font-telemetry-mono text-xs text-on-surface-variant">27.8k/dia</span>
+</label>
+<!-- Itapevi -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group opacity-75">
+<div class="flex items-center gap-2.5">
+<input class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Itapevi</span>
+</div>
+<span class="font-telemetry-mono text-xs text-outline">24.5k/dia</span>
+</label>
+<!-- Jandira -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group opacity-75">
+<div class="flex items-center gap-2.5">
+<input class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Jandira</span>
+</div>
+<span class="font-telemetry-mono text-xs text-outline">18.2k/dia</span>
+</label>
+<!-- Presidente Altino -->
+<label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors group opacity-75">
+<div class="flex items-center gap-2.5">
+<input class="rounded border-outline-variant/60 bg-surface-container text-secondary focus:ring-0 focus:ring-offset-0 w-4 h-4" type="checkbox"/>
+<span class="text-on-surface-variant group-hover:text-on-surface transition-colors">Presidente Altino</span>
+</div>
+<span class="font-telemetry-mono text-xs text-outline">15.7k/dia</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Left Column Bottom Action Dock -->
+<div class="p-space-md border-t border-outline-variant/30 bg-surface-container-low/50 flex items-center gap-2">
+<button class="w-1/3 py-2 text-center rounded-xl font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all">
+          Limpar
+        </button>
+<button class="w-2/3 py-2 px-3 rounded-xl font-label-md text-label-md font-semibold bg-primary-container text-on-primary-container hover:bg-primary transition-all flex items-center justify-center gap-1.5 shadow-md shadow-primary-container/20 active:scale-95">
+<span class="material-symbols-outlined text-base">filter_alt</span>
+          Aplicar (9)
+        </button>
+</div>
+</aside>
+<!-- RIGHT CANVAS AREA (flex-1) -->
+<main class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar p-space-md lg:p-space-lg gap-space-lg">
+<!-- VISUALIZATION CONTROL BAR (Glassmorphic Deck) -->
+<section class="bg-surface-container-low/70 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-space-md shadow-md flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+<!-- Left: Chart Type Toggles -->
+<div class="flex flex-wrap items-center gap-1 bg-surface-container-lowest p-1 rounded-xl border border-outline-variant/30">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high text-primary font-semibold text-xs border border-primary/30 shadow-sm">
+<span class="material-symbols-outlined text-base">show_chart</span>
+            Linhas Temporais
+          </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-xs transition-colors">
+<span class="material-symbols-outlined text-base">bar_chart</span>
+            Barras Comparativas
+          </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-xs transition-colors">
+<span class="material-symbols-outlined text-base">grid_view</span>
+            Heatmap Dia x Estação
+          </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface text-xs transition-colors">
+<span class="material-symbols-outlined text-base">radar</span>
+            Radar Perfil
+          </button>
+</div>
+<!-- Center: Metric Selector -->
+<div class="flex items-center bg-surface-container-lowest p-1 rounded-xl border border-outline-variant/30 text-xs font-label-sm">
+<button class="px-3 py-1.5 rounded-lg bg-secondary/15 text-secondary font-semibold border border-secondary/30">
+            Passageiros (Entradas)
+          </button>
+<button class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">
+            Receita Estimada (R$)
+          </button>
+<button class="px-3 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors">
+            Média / Dia Útil
+          </button>
+</div>
+<!-- Right: Granularity Grouping & Active Series Indicators -->
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-container-lowest p-1 rounded-xl border border-outline-variant/30 text-xs font-label-sm">
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface">Diário</button>
+<button class="px-2.5 py-1 bg-surface-container-high text-on-surface font-semibold rounded-lg shadow-sm">Semanal</button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface">Mensal</button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface">Anual</button>
+</div>
+<div class="h-6 w-px bg-outline-variant/30 hidden lg:block"></div>
+<!-- Color Swatches Active Legend -->
+<div class="hidden 2xl:flex items-center gap-3 text-xs font-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#10b981] ring-2 ring-[#10b981]/20"></span>
+<span class="text-on-surface">Vila Olímpia</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#14b8a6] ring-2 ring-[#14b8a6]/20"></span>
+<span class="text-on-surface">Pinheiros</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8] ring-2 ring-[#38bdf8]/20"></span>
+<span class="text-on-surface">Barueri</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#60a5fa] ring-2 ring-[#60a5fa]/20"></span>
+<span class="text-on-surface">Barra Funda</span>
+</div>
+</div>
+</div>
+</section>
+<!-- MAIN VISUALIZATION CANVAS CARD -->
+<section class="bg-surface-container-low/70 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-space-lg shadow-xl relative overflow-hidden flex flex-col">
+<!-- Header Canvas with contextual telemetry -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-outline-variant/20 gap-2">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">Curva Dinâmica de Fluxo de Embarques</h3>
+<span class="px-2 py-0.5 rounded text-[11px] font-telemetry-mono bg-primary/10 text-primary border border-primary/20">Telemetria Histórica Normalizada</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Série temporal consolidada comparando picos corporativos, quedas de fins de semana e impacto de megaeventos (2022 - 2026).</p>
+</div>
+<div class="flex items-center gap-2 text-xs font-telemetry-mono">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-highest/60 text-on-surface border border-outline-variant/30 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-secondary">trending_up</span> Headway Médio: 3.8 min
+            </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-highest/60 text-on-surface border border-outline-variant/30 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-primary">bolt</span> Padrão de Ponto Crítico Ativo
+            </span>
+</div>
+</div>
+<!-- SVG CHART DISPLAY CONTAINER -->
+<div class="relative w-full h-[400px] mt-4 select-none">
+<!-- Background Grid & Y-Axis Reference -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none text-[11px] font-telemetry-mono text-outline">
+<div class="w-full border-b border-outline-variant/15 flex items-center justify-between pb-1">
+<span>80k pass/dia</span>
+<span class="text-outline/50 uppercase tracking-wider text-[10px]">Capacidade Crítica</span>
+</div>
+<div class="w-full border-b border-outline-variant/15 flex items-center justify-between pb-1">
+<span>60k pass/dia</span>
+<span class="text-outline/50 uppercase tracking-wider text-[10px]">Horário de Pico (07h-09h / 17h-19h)</span>
+</div>
+<div class="w-full border-b border-outline-variant/15 flex items-center justify-between pb-1">
+<span>40k pass/dia</span>
+<span class="text-outline/50 uppercase tracking-wider text-[10px]">Média Ponderada Úteis</span>
+</div>
+<div class="w-full border-b border-outline-variant/15 flex items-center justify-between pb-1">
+<span>20k pass/dia</span>
+<span class="text-outline/50 uppercase tracking-wider text-[10px]">Vale Vale de Entrepico</span>
+</div>
+<div class="w-full border-b border-outline-variant/30 flex items-center justify-between pb-1">
+<span>0k</span>
+<span class="text-outline/50 uppercase tracking-wider text-[10px]">Piso Noturno</span>
+</div>
+</div>
+<!-- SVG Visual Curves (Pinheiros, Vila Olímpia, Barra Funda, Barueri) -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 350">
+<defs>
+<!-- Pinheiros Gradient (Teal/Emerald) -->
+<lineargradient id="grad-pinheiros" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#14b8a6" stop-opacity="0.28"></stop>
+<stop offset="100%" stop-color="#14b8a6" stop-opacity="0.0"></stop>
+</lineargradient>
+<!-- Vila Olímpia Gradient (Emerald) -->
+<lineargradient id="grad-vo" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#10b981" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#10b981" stop-opacity="0.0"></stop>
+</lineargradient>
+<!-- Filter for Luminous Corridor Glow -->
+<filter height="140%" id="glow-l9" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#10b981" flood-opacity="0.5" stddeviation="3"></fedropshadow>
+</filter>
+<filter height="140%" id="glow-l8" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#38bdf8" flood-opacity="0.5" stddeviation="3"></fedropshadow>
+</filter>
+</defs>
+<!-- Vertical Peak Event Marker Line (Nov 2024 GP / Eventos) -->
+<line opacity="0.75" stroke="#4edea3" stroke-dasharray="4,4" stroke-width="1.5" x1="720" x2="720" y1="20" y2="350"></line>
+<!-- AREA FILLS -->
+<!-- Area: Pinheiros -->
+<path d="M 0,220 C 80,210 120,180 180,160 C 240,140 280,200 340,150 C 400,100 450,170 520,130 C 590,90 640,160 720,70 C 800,140 880,110 1000,80 L 1000,350 L 0,350 Z" fill="url(#grad-pinheiros)"></path>
+<!-- Area: Vila Olímpia -->
+<path d="M 0,250 C 80,240 130,220 190,195 C 250,170 290,260 360,210 C 420,160 480,230 550,175 C 620,120 670,220 720,115 C 790,200 870,160 1000,130 L 1000,350 L 0,350 Z" fill="url(#grad-vo)"></path>
+<!-- STROKE LINES -->
+<!-- 4. Barueri (Cyan #38bdf8) -->
+<path d="M 0,280 C 70,275 140,260 210,245 C 280,230 350,270 420,235 C 490,200 560,240 630,215 C 700,190 750,210 820,180 C 890,150 940,165 1000,160" fill="none" filter="url(#glow-l8)" opacity="0.85" stroke="#38bdf8" stroke-width="2"></path>
+<!-- 3. Barra Funda (Blue #60a5fa) -->
+<path d="M 0,260 C 90,250 160,230 230,210 C 300,190 370,220 440,185 C 510,150 580,190 650,165 C 710,140 760,170 820,145 C 890,120 950,140 1000,135" fill="none" opacity="0.9" stroke="#60a5fa" stroke-width="2.2"></path>
+<!-- 2. Vila Olímpia (Emerald #10b981) -->
+<path d="M 0,250 C 80,240 130,220 190,195 C 250,170 290,260 360,210 C 420,160 480,230 550,175 C 620,120 670,220 720,115 C 790,200 870,160 1000,130" fill="none" filter="url(#glow-l9)" stroke="#10b981" stroke-width="2.8"></path>
+<!-- 1. Pinheiros (Teal #14b8a6) -->
+<path d="M 0,220 C 80,210 120,180 180,160 C 240,140 280,200 340,150 C 400,100 450,170 520,130 C 590,90 640,160 720,70 C 800,140 880,110 1000,80" fill="none" stroke="#14b8a6" stroke-width="3"></path>
+<!-- Key Focal Data Nodes at Nov 2024 (X: 720) -->
+<circle cx="720" cy="70" fill="#14b8a6" r="5" stroke="#0a0e18" stroke-width="2"></circle>
+<circle cx="720" cy="115" fill="#10b981" r="5" stroke="#0a0e18" stroke-width="2"></circle>
+<circle cx="720" cy="150" fill="#60a5fa" r="4" stroke="#0a0e18" stroke-width="1.5"></circle>
+<circle cx="720" cy="195" fill="#38bdf8" r="4" stroke="#0a0e18" stroke-width="1.5"></circle>
+</svg>
+<!-- INTERACTIVE HOVER INSPECTION TOOLTIP (Nov 2024 Event Peak) -->
+<div class="absolute left-[64%] top-[14%] -translate-x-1/2 w-72 bg-surface-container-high/95 backdrop-blur-2xl border border-primary/40 rounded-xl p-3 shadow-2xl z-20 pointer-events-auto">
+<div class="flex items-center justify-between pb-2 border-b border-outline-variant/30">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-headline-sm text-xs font-bold text-on-surface">Sem 45 • Nov 2024</span>
+</div>
+<span class="font-label-sm text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20">+14.2% WoW</span>
+</div>
+<p class="text-[11px] text-on-surface-variant font-body-sm py-1.5 leading-snug">
+              Impacto Simultâneo: GP Brasil de F1 (Interlagos) + Retomada Corporativa Presencial Berrini.
+            </p>
+<div class="space-y-1.5 font-telemetry-mono text-xs border-t border-outline-variant/20 pt-2">
+<div class="flex items-center justify-between">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#14b8a6]"></span> Pinheiros:
+                </span>
+<span class="font-semibold text-primary">61.8k pass/dia</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#10b981]"></span> Vila Olímpia:
+                </span>
+<span class="font-semibold text-primary">52.4k pass/dia</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#60a5fa]"></span> Barra Funda:
+                </span>
+<span class="font-semibold text-secondary">44.5k pass/dia</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="flex items-center gap-1.5 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#38bdf8]"></span> Barueri:
+                </span>
+<span class="font-semibold text-secondary">34.2k pass/dia</span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-outline-variant/30 flex items-center justify-between font-label-sm text-[11px]">
+<span class="text-outline">Receita Semanal Est.:</span>
+<span class="text-on-surface font-telemetry-mono font-bold">R$ 5.480.200</span>
+</div>
+</div>
+<!-- X-Axis Timestamps (2022 - 2026) -->
+<div class="absolute bottom-0 left-0 right-0 flex justify-between text-[11px] font-telemetry-mono text-outline pt-2 border-t border-outline-variant/30">
+<span>Jan 2022</span>
+<span>Jul 2022</span>
+<span>Jan 2023</span>
+<span>Jul 2023</span>
+<span>Jan 2024</span>
+<span class="text-primary font-bold">Nov 2024 (F1/Pico)</span>
+<span>Jan 2025</span>
+<span>Jul 2025</span>
+<span>Dez 2026 (Projeção)</span>
+</div>
+</div>
+<!-- QUICK METRIC SUMMARY CARDS (Inline below chart) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-space-lg mt-space-md border-t border-outline-variant/30">
+<!-- Metric 1 -->
+<div class="bg-surface-container/60 border border-outline-variant/30 rounded-xl p-space-md flex items-center justify-between relative overflow-hidden">
+<div class="space-y-0.5">
+<span class="text-label-sm font-label-sm text-outline uppercase tracking-wider">Pico Combinado Amostral</span>
+<div class="font-metric-display text-metric-display font-bold text-on-surface">192.9k <span class="text-xs font-normal text-on-surface-variant">pass/dia</span></div>
+<span class="text-xs font-telemetry-mono text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> Capacidade máx instantânea atingida
+              </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">speed</span>
+</div>
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-primary"></div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container/60 border border-outline-variant/30 rounded-xl p-space-md flex items-center justify-between relative overflow-hidden">
+<div class="space-y-0.5">
+<span class="text-label-sm font-label-sm text-outline uppercase tracking-wider">Estação Mais Dinâmica</span>
+<div class="font-metric-display text-metric-display font-bold text-secondary">Pinheiros <span class="text-xs font-normal text-on-surface-variant font-telemetry-mono">(L9)</span></div>
+<span class="text-xs font-telemetry-mono text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span> +28.4% YoY comparado a 2023
+              </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-2xl">hub</span>
+</div>
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-secondary"></div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container/60 border border-outline-variant/30 rounded-xl p-space-md flex items-center justify-between relative overflow-hidden">
+<div class="space-y-0.5">
+<span class="text-label-sm font-label-sm text-outline uppercase tracking-wider">Desvio Fim de Semana (Polo Corp.)</span>
+<div class="font-metric-display text-metric-display font-bold text-error">-64.2%</div>
+<span class="text-xs font-telemetry-mono text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">business</span> Vila Olímpia &amp; Berrini (Efeito Home Office)
+              </span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-error-container/20 border border-error/30 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-2xl">weekend</span>
+</div>
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-error"></div>
+</div>
+</div>
+</section>
+<!-- BOTTOM SECTION: Station Comparison Matrix & Insights -->
+<section class="bg-surface-container-low/70 backdrop-blur-xl border border-outline-variant/30 rounded-2xl p-space-md lg:p-space-lg shadow-xl flex flex-col gap-4">
+<!-- Table Header & Controls -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-outline-variant/20 gap-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-lg">table_chart</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-sm lg:text-headline-md text-on-surface font-bold">Matriz Comparativa de Desempenho por Estação</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Taxas de absorção de passageiros, assimetria útil/fim de semana e arrecadação projetada.</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright border border-outline-variant/50 text-xs font-label-sm text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">view_column</span> Colunas Customizadas
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-bright border border-outline-variant/50 text-xs font-label-sm text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">table_view</span> Exportar XLSX / PDF
+            </button>
+</div>
+</div>
+<!-- HIGH-DENSITY OPERATIONAL DATA TABLE -->
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/40 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-3 px-3">Estação</th>
+<th class="py-3 px-3">Linha</th>
+<th class="py-3 px-3 text-right">Volume Total (Período)</th>
+<th class="py-3 px-3 text-right">Média Dia Útil</th>
+<th class="py-3 px-3 text-right">Média Fim de Semana</th>
+<th class="py-3 px-3 text-center">Queda FDS (%)</th>
+<th class="py-3 px-3 text-right">Receita Total Est.</th>
+<th class="py-3 px-3">Perfil Predominante</th>
+<th class="py-3 px-3 text-center">Ações</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm divide-y divide-outline-variant/20">
+<!-- Row 1: Pinheiros -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Pinheiros
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/25">
+                    9 • Esmeralda
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">27.420.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-primary font-semibold">48.9k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">18.2k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -62.8%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 122.4M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Hub Conexão Metrô (L4)</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-primary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Osasco -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                  Osasco
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-tertiary-container/20 text-tertiary border border-tertiary/30">
+                    8 &amp; 9 Conexão
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">23.850.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-secondary font-semibold">42.6k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">26.5k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -37.8%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 106.5M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Hub Central Linhas 8 &amp; 9</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-secondary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Vila Olímpia -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Vila Olímpia
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/25">
+                    9 • Esmeralda
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">23.080.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-primary font-semibold">41.2k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">14.5k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -64.8%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 103.1M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Corporativo / Faria Lima</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-primary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Barra Funda -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                  Barra Funda
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/10 text-secondary border border-secondary/25">
+                    8 • Diamante
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">21.500.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-secondary font-semibold">38.4k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">22.8k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -40.6%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 96.0M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Hub Multimodal / Interestadual</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-secondary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Santo Amaro -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Santo Amaro
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/25">
+                    9 • Esmeralda
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">20.610.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-primary font-semibold">36.8k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">20.1k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -45.4%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 92.1M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Conexão Linha 5-Lilás</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-primary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Barueri -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                  Barueri
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/10 text-secondary border border-secondary/25">
+                    8 • Diamante
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">17.980.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-secondary font-semibold">32.1k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">17.6k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -45.2%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 80.3M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Polo Regional Alphaville</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-secondary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 7: Berrini -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                  Berrini
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/25">
+                    9 • Esmeralda
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">16.520.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-primary font-semibold">29.5k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">9.8k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -66.7%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 73.8M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Corporativo / Chucri Zaidan</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-primary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 8: Carapicuíba -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-3 font-medium text-on-surface flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                  Carapicuíba
+                </td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/10 text-secondary border border-secondary/25">
+                    8 • Diamante
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-medium">15.560.000</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-secondary font-semibold">27.8k</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface-variant">19.4k</td>
+<td class="py-3 px-3 text-center">
+<span class="inline-flex items-center gap-1 font-telemetry-mono text-xs text-error font-semibold bg-error-container/20 px-2 py-0.5 rounded-md">
+                    -30.2%
+                  </span>
+</td>
+<td class="py-3 px-3 text-right font-telemetry-mono text-on-surface font-semibold">R$ 69.5M</td>
+<td class="py-3 px-3">
+<span class="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded border border-outline-variant/30">Residencial / Alta Frequência</span>
+</td>
+<td class="py-3 px-3 text-center">
+<div class="flex items-center justify-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-high text-secondary" title="Destacar Série"><span class="material-symbols-outlined text-base">visibility</span></button>
+<button class="p-1 rounded hover:bg-surface-container-high text-outline" title="Exportar Dados"><span class="material-symbols-outlined text-base">file_download</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Telemetry Summary -->
+<div class="flex flex-col sm:flex-row items-center justify-between text-xs text-on-surface-variant pt-2 border-t border-outline-variant/20 gap-2 font-telemetry-mono">
+<div>Exibindo 8 de 9 estações selecionadas na visualização atual</div>
+<div class="flex items-center gap-4">
+<span>Volume Médio Amostral: <strong class="text-on-surface">37.1k/dia</strong></span>
+<span>Total Acumulado: <strong class="text-primary font-bold">184.2M pass</strong></span>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS ViaMobilidade - Menu Realista Linhas 8 e 9</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      /* Cores Oficiais ViaMobilidade */
+      --l8-diamante: #9E9E93;
+      --l8-diamante-dark: #78786e;
+      --l8-glow: rgba(158, 158, 147, 0.45);
+      
+      --l9-esmeralda: #00A88F;
+      --l9-esmeralda-dark: #007d6a;
+      --l9-glow: rgba(0, 168, 143, 0.45);
+      
+      /* Vermelho Institucional ViaMobilidade */
+      --vm-red: #e11d48;
+
+      /* Dimensões do Trem e Via */
+      --cabin-width: 162px;
+      --wagons-width: 620px;
+      --train-height: 78px;
+      --tunnel-width: 68px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #05080f;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================
+       ESTAÇÃO & TRILHOS COM CATENÁRIA
+       ========================================== */
+    .railway-station {
+      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #070b14 78%);
+      border: 1px solid #1e293b;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .train-track-wrapper {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .train-track {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      height: calc(var(--train-height) + 38px);
+      min-width: calc(var(--tunnel-width) + var(--wagons-width) + var(--cabin-width) + 70px);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(2, 6, 23, 0.95) 100%);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(51, 65, 85, 0.45);
+      padding-bottom: 12px;
+    }
+
+    /* 3. REDE AÉREA / CATENÁRIA (Fio de Alta Tensão Superior) */
+    .catenary-system {
+      position: absolute;
+      top: 0;
+      left: var(--tunnel-width);
+      right: 0;
+      height: 22px;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* Cabo Mensageiro + Treliça de Sustentação */
+    .catenary-system::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: 
+        repeating-linear-gradient(90deg, transparent 0px, transparent 58px, rgba(100, 116, 139, 0.45) 58px, rgba(100, 116, 139, 0.45) 60px),
+        linear-gradient(180deg, rgba(148, 163, 184, 0.35) 0px, transparent 1px);
+    }
+
+    /* Fio de Contato onde o Pantógrafo desliza */
+    .catenary-wire {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #64748b, #cbd5e1 50%, #64748b);
+      box-shadow: 0 1px 4px rgba(56, 189, 248, 0.3);
+    }
+
+    /* Trilhos e Dormentes na Base */
+    .railway-bed {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background: 
+        linear-gradient(180deg, #94a3b8 0px, #475569 2px, transparent 2px),
+        repeating-linear-gradient(90deg, transparent 0px, transparent 10px, #334155 10px, #1e293b 18px);
+      border-top: 2px solid #94a3b8;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ==========================================
+       2. BOCA DO TÚNEL & SEMÁFORO FERROVIÁRIO
+       ========================================== */
+    .tunnel-mouth {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--tunnel-width);
+      background: linear-gradient(90deg, #020617 78%, #0f172a 96%, transparent 100%);
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 14px 0;
+      border-right: 4px solid #334155;
+      box-shadow: 16px 0 28px rgba(0, 0, 0, 0.95);
+      user-select: none;
+    }
+
+    /* Sombra interna do arco do túnel */
+    .tunnel-mouth::after {
+      content: '';
+      position: absolute;
+      right: -10px;
+      top: 6px;
+      bottom: 10px;
+      width: 12px;
+      background: radial-gradient(ellipse at left, rgba(0,0,0,0.9), transparent 75%);
+      pointer-events: none;
+    }
+
+    /* Semáforo Ferroviário Duplo (Vermelho / Verde) */
+    .railway-signal {
+      background: #090d16;
+      border: 1.5px solid #475569;
+      border-radius: 10px;
+      padding: 3px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 2px 6px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .signal-light {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    /* Estado Fechado: Vermelho aceso */
+    .signal-light.red {
+      background: #ef4444;
+      box-shadow: 0 0 10px 2px rgba(239, 68, 68, 0.85), inset 0 1px 2px #fecaca;
+    }
+    .signal-light.green {
+      background: #064e3b;
+      opacity: 0.35;
+    }
+
+    /* Estado Aberto (.active): Verde aceso, Vermelho apagado */
+    .train-track.active .signal-light.red {
+      background: #450a0a;
+      box-shadow: none;
+      opacity: 0.35;
+    }
+    .train-track.active .signal-light.green {
+      background: #10b981;
+      opacity: 1;
+      box-shadow: 0 0 12px 3px rgba(16, 185, 129, 0.9), inset 0 1px 2px #a7f3d0;
+    }
+
+    .line-badge {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+
+    .l8-badge { background: linear-gradient(135deg, var(--l8-diamante), var(--l8-diamante-dark)); }
+    .l9-badge { background: linear-gradient(135deg, var(--l9-esmeralda), var(--l9-esmeralda-dark)); }
+
+    /* ==========================================
+       4. FÍSICA DE FRENAGEM E INÉRCIA (@keyframes)
+       ========================================== */
+    @keyframes trainDepartAndBrake {
+      0% {
+        transform: translateX(calc(var(--tunnel-width) - var(--wagons-width))) skewX(0deg);
+      }
+      18% {
+        /* Arrancada inicial saindo do túnel */
+        transform: translateX(calc(var(--tunnel-width) - var(--wagons-width) + 110px)) skewX(1.6deg);
+      }
+      76% {
+        /* Chega próximo ao para-choque e freia (inclina para frente pela inércia) */
+        transform: translateX(calc(var(--tunnel-width) + 14px)) skewX(-3.2deg);
+      }
+      90% {
+        /* Contra-balanço da suspensão voltando */
+        transform: translateX(calc(var(--tunnel-width) + 1px)) skewX(1.2deg);
+      }
+      100% {
+        /* Estabiliza perfeitamente na plataforma */
+        transform: translateX(calc(var(--tunnel-width) + 4px)) skewX(0deg);
+      }
+    }
+
+    @keyframes trainReverseToTunnel {
+      0% {
+        transform: translateX(calc(var(--tunnel-width) + 4px)) skewX(0deg);
+      }
+      22% {
+        /* Impulso de marcha à ré */
+        transform: translateX(calc(var(--tunnel-width) - 45px)) skewX(2.2deg);
+      }
+      85% {
+        transform: translateX(calc(var(--tunnel-width) - var(--wagons-width) - 6px)) skewX(-1.2deg);
+      }
+      100% {
+        transform: translateX(calc(var(--tunnel-width) - var(--wagons-width))) skewX(0deg);
+      }
+    }
+
+    /* Composição do Trem (Vagões + Cabine Frontal) */
+    .train-composition {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      height: var(--train-height);
+      cursor: pointer;
+      user-select: none;
+      transform-origin: bottom center;
+      transform: translateX(calc(var(--tunnel-width) - var(--wagons-width)));
+      transition: filter 0.3s ease, transform 0.35s ease;
+      will-change: transform;
+    }
+
+    /* Quando fechado e já foi interagido, recolhe com animação suave */
+    .train-track.reversing .train-composition {
+      animation: trainReverseToTunnel 0.75s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* Leve avanço ao passar o mouse quando fechado */
+    .train-track:not(.active):not(.reversing) .train-composition:hover {
+      transform: translateX(calc(var(--tunnel-width) - var(--wagons-width) + 14px));
+      filter: brightness(1.06);
+    }
+
+    /* ESTADO ABERTO: Aciona a física realista de partida e frenagem */
+    .train-track.active .train-composition {
+      animation: trainDepartAndBrake 0.92s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* ==========================================
+       3. PANTÓGRAFO ARTICULADO E FAÍSCAS ELÉTRICAS
+       ========================================== */
+    .pantograph-assembly {
+      position: absolute;
+      top: -19px;
+      right: 55px;
+      width: 44px;
+      height: 20px;
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    /* Base isoladora no teto do vagão */
+    .pantograph-base {
+      position: absolute;
+      bottom: 0;
+      left: 8px;
+      right: 8px;
+      height: 4px;
+      background: #334155;
+      border-radius: 2px;
+      border: 1px solid #64748b;
+    }
+
+    /* Braço articulado em losango / Z */
+    .pantograph-arm {
+      position: absolute;
+      bottom: 3px;
+      left: 11px;
+      width: 22px;
+      height: 15px;
+      border-left: 2.5px solid #94a3b8;
+      border-top: 2.5px solid #cbd5e1;
+      transform: skewX(-28deg);
+      transform-origin: bottom left;
+      transition: height 0.35s ease;
+    }
+
+    .pantograph-collector {
+      position: absolute;
+      top: 0;
+      left: 4px;
+      width: 30px;
+      height: 3px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      box-shadow: 0 -1px 4px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Faísca elétrica (Arco Voltaico) no contato com a catenária */
+    @keyframes electricArc {
+      0%, 100% { opacity: 0; transform: scale(0.4); }
+      15% { opacity: 1; transform: scale(1.3); }
+      25% { opacity: 0.2; transform: scale(0.7); }
+      45% { opacity: 0.95; transform: scale(1.5); }
+      60% { opacity: 0; transform: scale(0.5); }
+      80% { opacity: 0.85; transform: scale(1.1); }
+    }
+
+    .electric-spark {
+      position: absolute;
+      top: -6px;
+      left: 16px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 
+        0 0 10px 4px #38bdf8,
+        0 0 22px 8px rgba(56, 189, 248, 0.75),
+        0 0 35px 12px rgba(255, 255, 255, 0.6);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Faísca dispara durante a movimentação ou pulsos sutis quando energizado */
+    .train-track.sparking .electric-spark {
+      animation: electricArc 0.85s ease-out;
+    }
+
+    /* ==========================================
+       CORPO DOS VAGÕES & 5. PORTAS QUE SE ABREM
+       ========================================== */
+    .train-wagons {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      width: var(--wagons-width);
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        #94a3b8 0%,
+        #f1f5f9 18%,
+        #cbd5e1 48%,
+        #e2e8f0 52%,
+        #94a3b8 85%,
+        #475569 100%
+      );
+      padding: 0 10px;
+      box-sizing: border-box;
+      position: relative;
+      box-shadow: inset 0 2px 3px rgba(255,255,255,0.8), 0 8px 16px rgba(0,0,0,0.65);
+    }
+
+    /* Faixas horizontais da linha nos vagões */
+    .line-8 .train-wagons {
+      border-top: 4px solid var(--l8-diamante);
+      border-bottom: 8px solid var(--l8-diamante);
+    }
+
+    .line-9 .train-wagons {
+      border-top: 4px solid var(--l9-esmeralda);
+      border-bottom: 8px solid var(--l9-esmeralda);
+    }
+
+    /* Rodas / Truques embaixo dos vagões */
+    .train-wagons::after,
+    .train-cabin::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 16px;
+      right: 22px;
+      height: 6px;
+      background: repeating-linear-gradient(
+        90deg,
+        #1e293b 0px,
+        #475569 12px,
+        #1e293b 24px,
+        transparent 24px,
+        transparent 52px
+      );
+      z-index: -1;
+    }
+
+    /* Sanfona de conexão entre vagões (Gangway) */
+    .wagon-connector {
+      width: 7px;
+      height: 86%;
+      background: repeating-linear-gradient(90deg, #0f172a 0px, #334155 2px, #0f172a 4px);
+      border-top: 2px solid #1e293b;
+      border-bottom: 2px solid #1e293b;
+      flex-shrink: 0;
+    }
+
+    /* Botão do Vagão com Portas Corrediças Automáticas */
+    .wagon-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 50px;
+      min-width: 124px;
+      padding: 0 12px;
+      border-radius: 7px;
+      border: 2px solid #334155;
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.45);
+    }
+
+    /* Luz Interna Quente de Salão de Passageiros (Aparece quando as portas se abrem) */
+    .wagon-interior-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, #fef08a 0%, #f59e0b 65%, #b45309 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+
+    /* Piso antiderrapante e soleira iluminada na porta aberta */
+    .wagon-interior-glow::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: repeating-linear-gradient(90deg, #facc15 0px, #facc15 6px, #451a03 6px, #451a03 10px);
+    }
+
+    /* Folhas das Portas Corrediças (Esquerda e Direita) */
+    .sliding-door {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50.5%;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s ease;
+      z-index: 2;
+    }
+
+    .sliding-door.door-left {
+      left: 0;
+      border-right: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .sliding-door.door-right {
+      right: 0;
+      border-left: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    /* Reflexo superior do vidro nas portas fechadas */
+    .sliding-door::before {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      right: 4px;
+      height: 32%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%);
+      border-radius: 2px;
+    }
+
+    /* Conteúdo (Ícone + Texto do Menu) */
+    .wagon-label-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+    }
+
+    /* Hover quando fechado: fresta sutil nas portas */
+    .wagon-item:hover:not(.selected-menu) .sliding-door.door-left {
+      transform: translateX(-18%);
+    }
+    .wagon-item:hover:not(.selected-menu) .sliding-door.door-right {
+      transform: translateX(18%);
+    }
+    .wagon-item:hover:not(.selected-menu) .wagon-interior-glow {
+      opacity: 0.45;
+    }
+
+    /* ESTADO SELECIONADO (.selected-menu): Portas se abrem totalmente e luz interna amarela acende */
+    .wagon-item.selected-menu {
+      border-color: #fde047;
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 18px rgba(250, 204, 21, 0.45),
+        0 0 12px rgba(254, 240, 138, 0.5);
+    }
+
+    .wagon-item.selected-menu .sliding-door.door-left {
+      transform: translateX(-86%);
+      background: #475569;
+    }
+
+    .wagon-item.selected-menu .sliding-door.door-right {
+      transform: translateX(86%);
+      background: #475569;
+    }
+
+    .wagon-item.selected-menu .wagon-interior-glow {
+      opacity: 1;
+    }
+
+    .wagon-item.selected-menu .wagon-label-content {
+      color: #090d16;
+      font-weight: 800;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    /* ==========================================
+       1. CABINE FRONTAL & LETREIRO LED MATRIX
+       ========================================== */
+    .train-cabin {
+      width: var(--cabin-width);
+      height: 100%;
+      background: linear-gradient(
+        165deg,
+        #f8fafc 0%,
+        #e2e8f0 38%,
+        #cbd5e1 72%,
+        #94a3b8 100%
+      );
+      border-radius: 0 44px 16px 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 7px 14px 9px 10px;
+      box-sizing: border-box;
+      border-left: 4px solid #334155;
+      box-shadow: 10px 4px 20px rgba(0,0,0,0.7), inset 0 2px 3px rgba(255,255,255,0.9);
+    }
+
+    .line-8 .train-cabin {
+      border-top: 4px solid var(--l8-diamante);
+      border-bottom: 8px solid var(--l8-diamante);
+    }
+
+    .line-9 .train-cabin {
+      border-top: 4px solid var(--l9-esmeralda);
+      border-bottom: 8px solid var(--l9-esmeralda);
+    }
+
+    .cabin-stripe {
+      position: absolute;
+      right: 18px;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      transform: skewX(-18deg);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .line-8 .cabin-stripe {
+      background: linear-gradient(180deg, var(--l8-diamante) 0%, var(--vm-red) 100%);
+    }
+
+    .line-9 .cabin-stripe {
+      background: linear-gradient(180deg, var(--l9-esmeralda) 0%, var(--vm-red) 100%);
+    }
+
+    .cabin-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      z-index: 2;
+    }
+
+    /* Letreiro Digital de Matriz de LED com Scroll (Amber / Emerald Matrix) */
+    .led-matrix-housing {
+      width: 86px;
+      height: 20px;
+      background: #04070d;
+      border-radius: 4px;
+      border: 1.5px solid #334155;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.95), 0 1px 0 rgba(255,255,255,0.5);
+    }
+
+    /* Efeito de grade pixelada de painel de LED */
+    .led-matrix-housing::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.45) 1px, transparent 0);
+      background-size: 2px 2px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes ledTicker {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-115%); }
+    }
+
+    .led-matrix-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 800;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: inline-block;
+      padding-left: 6px;
+      animation: ledTicker 7.5s linear infinite;
+    }
+
+    /* Cor Âmbar na Linha 8 e Verde Luminoso na Linha 9 */
+    .line-8 .led-matrix-text {
+      color: #fbbf24;
+      text-shadow: 0 0 6px rgba(251, 191, 36, 0.85);
+    }
+
+    .line-9 .led-matrix-text {
+      color: #34d399;
+      text-shadow: 0 0 6px rgba(52, 211, 153, 0.85);
+    }
+
+    /* Para-brisa panorâmico escuro */
+    .windshield {
+      width: 42px;
+      height: 22px;
+      background: linear-gradient(135deg, #020617 0%, #1e293b 65%, #475569 100%);
+      border-radius: 4px 24px 6px 4px;
+      border: 1.5px solid #334155;
+      box-shadow: inset 0 -2px 5px rgba(255,255,255,0.25), 0 2px 4px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+    }
+
+    .cabin-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 2;
+    }
+
+    .cabin-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cabin-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ef4444;
+      transition: all 0.3s ease;
+    }
+
+    .train-track.active .cabin-status-dot {
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Farol de LED Frontal + Feixe de Luz */
+    .headlights {
+      position: absolute;
+      right: 3px;
+      bottom: 8px;
+      width: 6px;
+      height: 13px;
+      background: #fef08a;
+      border-radius: 4px;
+      border: 1px solid #ca8a04;
+      opacity: 0.55;
+      transition: all 0.35s ease;
+      z-index: 5;
+    }
+
+    .headlights::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: -16px;
+      width: 70px;
+      height: 46px;
+      background: linear-gradient(90deg, rgba(254, 240, 138, 0.6) 0%, rgba(254, 240, 138, 0.18) 55%, transparent 100%);
+      clip-path: polygon(0 38%, 100% 0, 100% 100%, 0 62%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .train-track.active .headlights {
+      opacity: 1;
+      background: #ffffff;
+      border-color: #fef08a;
+      box-shadow: 
+        4px 0 12px 3px rgba(254, 240, 138, 0.95),
+        12px 0 24px 6px rgba(254, 240, 138, 0.6);
+    }
+
+    .train-track.active .headlights::after {
+      opacity: 1;
+    }
+
+    .track-hint {
+      position: absolute;
+      right: 22px;
+      top: 54%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #64748b;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .train-track.active .track-hint {
+      opacity: 0;
+    }
+
+    /* Para-choque de limite de via */
+    .buffer-stop {
+      position: absolute;
+      right: 0;
+      bottom: 10px;
+      width: 10px;
+      height: 28px;
+      background: repeating-linear-gradient(
+        45deg,
+        #ef4444,
+        #ef4444 4px,
+        #f8fafc 4px,
+        #f8fafc 8px
+      );
+      border-radius: 3px 0 0 3px;
+      border: 1px solid #991b1b;
+      z-index: 4;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8 selection:bg-teal-500 selection:text-slate-950">
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div class="max-w-6xl w-full mx-auto space-y-6">
+
+    <!-- CABEÇALHO DO SAAS + CONTROLES RÁPIDOS -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-rose-600 to-teal-500 flex items-center justify-center shadow-lg shadow-teal-500/10">
+          <i data-lucide="train-front" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg md:text-xl font-bold tracking-tight text-white">ViaSaaS Mobility Cloud</h1>
+            <span class="text-[11px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              Realismo Ferroviário v2.0
+            </span>
+          </div>
+          <p class="text-xs md:text-sm text-slate-400">
+            Com Semáforo de Túnel, Pantógrafo Elétrico, Letreiro LED Dinâmico, Inércia de Frenagem e Portas Automáticas.
+          </p>
+        </div>
+      </div>
+
+      <!-- Botões de Teste Rápido e Ver Código -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="toggleTrain('track-l8')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full" style="background: #9E9E93;"></span>
+          Linha 8 (Diamante)
+        </button>
+        <button onclick="toggleTrain('track-l9')" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full" style="background: #00A88F;"></span>
+          Linha 9 (Esmeralda)
+        </button>
+        <button onclick="closeAllTrains()" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/60 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700/80 transition flex items-center gap-1.5" title="Recolher todos para o túnel">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          Recolher
+        </button>
+        <button onclick="toggleCodeModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-teal-500 hover:bg-teal-400 text-slate-950 transition flex items-center gap-1.5 shadow-lg shadow-teal-500/20">
+          <i data-lucide="code-2" class="w-4 h-4"></i>
+          Copiar Código CSS/JS
+        </button>
+      </div>
+    </header>
+
+    <!-- BARRA DE RECURSOS VISUAIS ATIVOS -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-[11px]">
+      <div class="bg-slate-900/70 border border-slate-800/90 rounded-xl px-3 py-2 flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]"></span>
+        <span><strong>1. LED Matrix:</strong> Destino rolante</span>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800/90 rounded-xl px-3 py-2 flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10b981]"></span>
+        <span><strong>2. Semáforo:</strong> Verde/Vermelho</span>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800/90 rounded-xl px-3 py-2 flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+        <span><strong>3. Pantógrafo:</strong> Arco elétrico</span>
+      </div>
+      <div class="bg-slate-900/70 border border-slate-800/90 rounded-xl px-3 py-2 flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-rose-400 shadow-[0_0_8px_#fb7185]"></span>
+        <span><strong>4. Frenagem:</strong> Inércia física</span>
+      </div>
+      <div class="col-span-2 sm:col-span-1 bg-slate-900/70 border border-slate-800/90 rounded-xl px-3 py-2 flex items-center gap-2 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-yellow-300 shadow-[0_0_8px_#fde047]"></span>
+        <span><strong>5. Portas:</strong> Luz interna ativa</span>
+      </div>
+    </div>
+
+    <!-- ESTAÇÃO DE NAVEGAÇÃO (OS DOIS TRENS) -->
+    <section class="railway-station p-5 md:p-6 rounded-2xl space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400 px-1">
+        <span class="font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Gestão de Arrecadação ViaMobilidade — Plataforma Interativa SaaS
+        </span>
+        <span id="station-status" class="font-mono text-amber-400">
+          SINAL VERDE L8 • TREM DIAMANTE NA PLATAFORMA
+        </span>
+      </div>
+
+      <!-- ====================================================
+           TRILHO 1: LINHA 8 - DIAMANTE (#9E9E93)
+           ==================================================== -->
+      <div class="train-track-wrapper">
+        <div class="train-track active" id="track-l8">
+          
+          <!-- 3. Rede Aérea (Catenária) -->
+          <div class="catenary-system">
+            <div class="catenary-wire"></div>
+          </div>
+
+          <!-- 2. Boca do Túnel + Semáforo Ferroviário -->
+          <div class="tunnel-mouth" title="Túnel e Semáforo Linha 8 - Diamante">
+            <div class="railway-signal" title="Semáforo da Via">
+              <span class="signal-light red"></span>
+              <span class="signal-light green"></span>
+            </div>
+            <span class="line-badge l8-badge">8</span>
+          </div>
+
+          <!-- Composição Completa Linha 8 -->
+          <div class="train-composition line-8" onclick="toggleTrain('track-l8')">
+            
+            <!-- Vagões com Portas Automáticas que se abrem no item ativo -->
+            <div class="train-wagons">
+              <!-- 3. Pantógrafo e Faísca Elétrica no Teto -->
+              <div class="pantograph-assembly">
+                <div class="pantograph-collector"></div>
+                <div class="pantograph-arm"></div>
+                <div class="pantograph-base"></div>
+                <div class="electric-spark"></div>
+              </div>
+
+              <!-- Vagão 1: Dashboard -->
+              <button type="button" class="wagon-item selected-menu" data-menu="dashboard" onclick="selectMenuItem(event, 'l8', 'dashboard')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i>
+                  Dashboard
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 2: Agenda -->
+              <button type="button" class="wagon-item" data-menu="agenda" onclick="selectMenuItem(event, 'l8', 'agenda')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i>
+                  Agenda
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 3: Clientes -->
+              <button type="button" class="wagon-item" data-menu="clientes" onclick="selectMenuItem(event, 'l8', 'clientes')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                  Clientes
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 4: Estoque -->
+              <button type="button" class="wagon-item" data-menu="estoque" onclick="selectMenuItem(event, 'l8', 'estoque')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="package-check" class="w-3.5 h-3.5"></i>
+                  Estoque
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+            </div>
+
+            <!-- 1. Cabine Frontal com Letreiro Digital LED Matrix -->
+            <div class="train-cabin" title="Clique para partir ou recolher o trem da Linha 8 - Diamante">
+              <div class="cabin-stripe"></div>
+              <div class="cabin-top-row">
+                <div class="led-matrix-housing" title="Letreiro Digital de Destino">
+                  <span id="led-text-l8" class="led-matrix-text">L8 • DESTINO: DASHBOARD • J.PRESTES</span>
+                </div>
+                <div class="windshield"></div>
+              </div>
+              <div class="cabin-bottom-row">
+                <span class="cabin-label">
+                  <span class="cabin-status-dot"></span>
+                  Diamante
+                </span>
+              </div>
+              <div class="headlights"></div>
+            </div>
+
+          </div>
+
+          <!-- Dica visual no trilho quando fechado -->
+          <div class="track-hint">
+            <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Sinal Vermelho • Clique na cabine da <strong>Linha 8 (Diamante)</strong> para liberar partida</span>
+          </div>
+
+          <!-- Para-choque de limite de via e Dormentes -->
+          <div class="buffer-stop" title="Para-choque de Fim de Via"></div>
+          <div class="railway-bed"></div>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           TRILHO 2: LINHA 9 - ESMERALDA (#00A88F)
+           ==================================================== -->
+      <div class="train-track-wrapper">
+        <div class="train-track" id="track-l9">
+          
+          <!-- 3. Rede Aérea (Catenária) -->
+          <div class="catenary-system">
+            <div class="catenary-wire"></div>
+          </div>
+
+          <!-- 2. Boca do Túnel + Semáforo Ferroviário -->
+          <div class="tunnel-mouth" title="Túnel e Semáforo Linha 9 - Esmeralda">
+            <div class="railway-signal" title="Semáforo da Via">
+              <span class="signal-light red"></span>
+              <span class="signal-light green"></span>
+            </div>
+            <span class="line-badge l9-badge">9</span>
+          </div>
+
+          <!-- Composição Completa Linha 9 -->
+          <div class="train-composition line-9" onclick="toggleTrain('track-l9')">
+            
+            <!-- Vagões com Portas Automáticas -->
+            <div class="train-wagons">
+              <!-- 3. Pantógrafo e Faísca Elétrica no Teto -->
+              <div class="pantograph-assembly">
+                <div class="pantograph-collector"></div>
+                <div class="pantograph-arm"></div>
+                <div class="pantograph-base"></div>
+                <div class="electric-spark"></div>
+              </div>
+
+              <!-- Vagão 1: Financeiro -->
+              <button type="button" class="wagon-item" data-menu="financeiro" onclick="selectMenuItem(event, 'l9', 'financeiro')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
+                  Financeiro
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 2: Comissões -->
+              <button type="button" class="wagon-item" data-menu="comissoes" onclick="selectMenuItem(event, 'l9', 'comissoes')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                  Comissões
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 3: Automação -->
+              <button type="button" class="wagon-item" data-menu="automacao" onclick="selectMenuItem(event, 'l9', 'automacao')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                  Automação
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+
+              <!-- Vagão 4: Ajustes -->
+              <button type="button" class="wagon-item" data-menu="ajustes" onclick="selectMenuItem(event, 'l9', 'ajustes')">
+                <div class="wagon-interior-glow"></div>
+                <div class="sliding-door door-left"></div>
+                <div class="sliding-door door-right"></div>
+                <span class="wagon-label-content">
+                  <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                  Ajustes
+                </span>
+              </button>
+
+              <div class="wagon-connector"></div>
+            </div>
+
+            <!-- 1. Cabine Frontal com Letreiro Digital LED Matrix -->
+            <div class="train-cabin" title="Clique para partir ou recolher o trem da Linha 9 - Esmeralda">
+              <div class="cabin-stripe"></div>
+              <div class="cabin-top-row">
+                <div class="led-matrix-housing" title="Letreiro Digital de Destino">
+                  <span id="led-text-l9" class="led-matrix-text">L9 • VGINHA • VIA PINHEIROS</span>
+                </div>
+                <div class="windshield"></div>
+              </div>
+              <div class="cabin-bottom-row">
+                <span class="cabin-label">
+                  <span class="cabin-status-dot"></span>
+                  Esmeralda
+                </span>
+              </div>
+              <div class="headlights"></div>
+            </div>
+
+          </div>
+
+          <!-- Dica visual no trilho quando fechado -->
+          <div class="track-hint">
+            <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5 text-teal-400"></i>
+            <span>Sinal Vermelho • Clique na cabine da <strong>Linha 9 (Esmeralda)</strong> para liberar partida</span>
+          </div>
+
+          <!-- Para-choque de limite de via e Dormentes -->
+          <div class="buffer-stop" title="Para-choque de Fim de Via"></div>
+          <div class="railway-bed"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ÁREA DE CONTEÚDO DINÂMICO DO SAAS -->
+    <main class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl transition-all">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="content-badge" class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-slate-950 shadow-md" style="background-color: #9E9E93;">
+            L8
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 id="content-title" class="text-xl font-bold text-white">Dashboard Operacional</h2>
+              <span id="content-line-tag" class="text-xs px-2.5 py-0.5 rounded-md font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                Linha 8 - Diamante
+              </span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-yellow-400/15 text-yellow-300 border border-yellow-400/30 font-mono">
+                PORTAS ABERTAS
+              </span>
+            </div>
+            <p id="content-subtitle" class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Visão geral em tempo real das métricas e indicadores do seu SaaS.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-950/70 px-3.5 py-2 rounded-xl border border-slate-800">
+          <i data-lucide="door-open" class="w-4 h-4 text-yellow-400"></i>
+          <span>Clique em um vagão para abrir suas portas e atualizar o letreiro de LED</span>
+        </div>
+      </div>
+
+      <!-- Cards de Métricas do Módulo Selecionado -->
+      <div id="content-cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+        <!-- Preenchido dinamicamente pelo JS -->
+      </div>
+    </main>
+
+  </div>
+
+  <!-- MODAL PARA COPIAR O CÓDIGO CSS / HTML / JS -->
+  <div id="code-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="file-code-2" class="w-5 h-5 text-teal-400"></i>
+          <h3 class="font-bold text-white text-base">Código Completo com as 5 Melhorias Ferroviárias (HTML + CSS + JS)</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="copySnippet()" id="copy-btn" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-teal-500 hover:bg-teal-400 text-slate-950 transition flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span>Copiar Código</span>
+          </button>
+          <button onclick="toggleCodeModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-5 overflow-y-auto font-mono text-xs text-slate-300 bg-slate-950/90 leading-relaxed select-all">
+<pre id="code-snippet" class="whitespace-pre-wrap break-words"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS DE INTERATIVIDADE -->
+  <script>
+    // Dados simulados de cada vagão do SaaS
+    const saasModules = {
+      dashboard: {
+        line: 'l8',
+        lineName: 'Linha 8 - Diamante',
+        ledLabel: 'L8 • DESTINO: DASHBOARD • J.PRESTES',
+        color: '#9E9E93',
+        title: 'Dashboard Operacional',
+        subtitle: 'Visão geral em tempo real das métricas e indicadores do seu SaaS.',
+        cards: [
+          { label: 'Receita Recorrente (MRR)', value: 'R$ 148.920', trend: '+14.2% este mês', icon: 'bar-chart-3' },
+          { label: 'Usuários Ativos Agora', value: '1.284', trend: '99.98% uptime', icon: 'activity' },
+          { label: 'Tickets Resolvidos', value: '94,6%', trend: 'Tempo médio: 4min', icon: 'check-circle-2' }
+        ]
+      },
+      agenda: {
+        line: 'l8',
+        lineName: 'Linha 8 - Diamante',
+        ledLabel: 'L8 • DESTINO: AGENDA • OSASCO',
+        color: '#9E9E93',
+        title: 'Agenda & Compromissos',
+        subtitle: 'Controle de horários, reuniões e reservas integradas da operação.',
+        cards: [
+          { label: 'Reuniões Hoje', value: '18 agendadas', trend: 'Próxima em 15 min', icon: 'calendar' },
+          { label: 'Taxa de Comparecimento', value: '91,4%', trend: '+3.1% vs semana passada', icon: 'user-check' },
+          { label: 'Lembretes via WhatsApp', value: '342 enviados', trend: 'Automático ativo', icon: 'bell-ring' }
+        ]
+      },
+      clientes: {
+        line: 'l8',
+        lineName: 'Linha 8 - Diamante',
+        ledLabel: 'L8 • DESTINO: CLIENTES • BARUERI',
+        color: '#9E9E93',
+        title: 'Base de Clientes (CRM)',
+        subtitle: 'Gestão de contas ativas, onboarding e histórico de relacionamento.',
+        cards: [
+          { label: 'Total de Clientes', value: '3.410 empresas', trend: '+86 novos no mês', icon: 'users' },
+          { label: 'NPS (Satisfação)', value: '78 pontos', trend: 'Zona de Excelência', icon: 'heart-handshake' },
+          { label: 'Churn Rate', value: '1,1%', trend: 'Abaixo da meta (2%)', icon: 'shield-check' }
+        ]
+      },
+      estoque: {
+        line: 'l8',
+        lineName: 'Linha 8 - Diamante',
+        ledLabel: 'L8 • DESTINO: ESTOQUE • ITAPEVI',
+        color: '#9E9E93',
+        title: 'Controle de Estoque & Insumos',
+        subtitle: 'Monitoramento de produtos, lotes e alertas de reposição automática.',
+        cards: [
+          { label: 'SKUs Cadastrados', value: '842 itens', trend: '100% sincronizado', icon: 'boxes' },
+          { label: 'Alerta de Estoque Baixo', value: '4 produtos', trend: 'Pedido de compra gerado', icon: 'alert-triangle' },
+          { label: 'Giro de Estoque', value: '14 dias', trend: 'Alta eficiência', icon: 'truck' }
+        ]
+      },
+      financeiro: {
+        line: 'l9',
+        lineName: 'Linha 9 - Esmeralda',
+        ledLabel: 'L9 • DESTINO: FINANCEIRO • PINHEIROS',
+        color: '#00A88F',
+        title: 'Gestão Financeira & Fluxo de Caixa',
+        subtitle: 'Faturamento, conciliação bancária, PIX e emissão de notas fiscais.',
+        cards: [
+          { label: 'Saldo em Caixa', value: 'R$ 412.650', trend: '+R$ 38.400 hoje', icon: 'wallet' },
+          { label: 'Inadimplência', value: '2,3%', trend: 'Régua de cobrança ativa', icon: 'file-check-2' },
+          { label: 'Notas Emitidas (NFS-e)', value: '1.190 notas', trend: 'Lote processado', icon: 'receipt' }
+        ]
+      },
+      comissoes: {
+        line: 'l9',
+        lineName: 'Linha 9 - Esmeralda',
+        ledLabel: 'L9 • DESTINO: COMISSÕES • MORUMBI',
+        color: '#00A88F',
+        title: 'Central de Comissões & Repasses',
+        subtitle: 'Cálculo transparente de comissões de vendedores, afiliados e parceiros.',
+        cards: [
+          { label: 'Comissões a Pagar', value: 'R$ 29.480', trend: 'Fechamento dia 05', icon: 'coins' },
+          { label: 'Top Vendedor do Mês', value: 'Camila R.', trend: '42 contratos fechados', icon: 'award' },
+          { label: 'Split de Pagamento', value: 'Ativo (Automático)', trend: 'Zero erro manual', icon: 'git-fork' }
+        ]
+      },
+      automacao: {
+        line: 'l9',
+        lineName: 'Linha 9 - Esmeralda',
+        ledLabel: 'L9 • DESTINO: AUTOMAÇÃO • SANTO AMARO',
+        color: '#00A88F',
+        title: 'Fluxos de Automação & IA',
+        subtitle: 'Webhooks, chatbots e gatilhos inteligentes trabalhando 24/7 no seu SaaS.',
+        cards: [
+          { label: 'Tarefas Automatizadas', value: '14.820 ações', trend: 'Economia de 190h/mês', icon: 'bot' },
+          { label: 'Integrações Ativas', value: '12 conectores', trend: 'Stripe, Asaas, Meta, ERP', icon: 'plug-zap' },
+          { label: 'Tempo de Resposta IA', value: '0.8 segundos', trend: 'Modelo otimizado', icon: 'cpu' }
+        ]
+      },
+      ajustes: {
+        line: 'l9',
+        lineName: 'Linha 9 - Esmeralda',
+        ledLabel: 'L9 • DESTINO: AJUSTES • VARGINHA',
+        color: '#00A88F',
+        title: 'Configurações Gerais do Sistema',
+        subtitle: 'Permissões de equipe, chaves de API, domínio personalizado e segurança.',
+        cards: [
+          { label: 'Membros da Equipe', value: '24 colaboradores', trend: 'Controle RBAC ativo', icon: 'shield' },
+          { label: 'Requisições de API', value: '89.400 / 100k', trend: 'Plano Enterprise', icon: 'key-round' },
+          { label: 'Último Backup', value: 'Há 12 minutos', trend: 'Criptografia AES-256', icon: 'database-backup' }
+        ]
+      }
+    };
+
+    /**
+     * Dispara o efeito de faísca elétrica no pantógrafo ao movimentar o trem
+     */
+    function triggerPantographSpark(trackElement) {
+      trackElement.classList.remove('sparking');
+      void trackElement.offsetWidth; // Reflow para reiniciar animação CSS
+      trackElement.classList.add('sparking');
+      setTimeout(() => {
+        trackElement.classList.remove('sparking');
+      }, 900);
+    }
+
+    /**
+     * Abre ou fecha o trem clicado com Semáforo, Faísca no Pantógrafo e Física de Frenagem
+     */
+    function toggleTrain(trackId) {
+      const clickedTrack = document.getElementById(trackId);
+      const allTracks = document.querySelectorAll('.train-track');
+      const isAlreadyOpen = clickedTrack.classList.contains('active');
+
+      // Recolhe qualquer trem que esteja aberto aplicando a animação de ré
+      allTracks.forEach(track => {
+        if (track.classList.contains('active')) {
+          track.classList.remove('active');
+          track.classList.add('reversing');
+          triggerPantographSpark(track);
+        }
+      });
+
+      // Se o trem clicado estava fechado, muda o semáforo para verde e avança com inércia
+      if (!isAlreadyOpen) {
+        clickedTrack.classList.remove('reversing');
+        clickedTrack.classList.add('active');
+        triggerPantographSpark(clickedTrack);
+      }
+
+      updateStationStatusText();
+    }
+
+    /**
+     * Recolhe ambos os trens para dentro do túnel
+     */
+    function closeAllTrains() {
+      document.querySelectorAll('.train-track').forEach(track => {
+        if (track.classList.contains('active')) {
+          track.classList.remove('active');
+          track.classList.add('reversing');
+          triggerPantographSpark(track);
+        }
+      });
+      updateStationStatusText();
+    }
+
+    /**
+     * Atualiza o indicador de status da Gestão de Arrecadação no topo da estação
+     */
+    function updateStationStatusText() {
+      const l8Open = document.getElementById('track-l8').classList.contains('active');
+      const l9Open = document.getElementById('track-l9').classList.contains('active');
+      const statusEl = document.getElementById('station-status');
+
+      if (l8Open) {
+        statusEl.textContent = 'SINAL VERDE L8 • TREM DIAMANTE NA PLATAFORMA (L9 NO TÚNEL)';
+        statusEl.className = 'font-mono text-amber-400';
+      } else if (l9Open) {
+        statusEl.textContent = 'SINAL VERDE L9 • TREM ESMERALDA NA PLATAFORMA (L8 NO TÚNEL)';
+        statusEl.className = 'font-mono text-emerald-400';
+      } else {
+        statusEl.textContent = 'SINAIS VERMELHOS • AMBOS OS TRENS RECOLHIDOS NO TÚNEL';
+        statusEl.className = 'font-mono text-rose-400';
+      }
+    }
+
+    /**
+     * Abre as portas do vagão clicado, acende a luz interna e atualiza o letreiro de LED
+     */
+    function selectMenuItem(event, linePrefix, moduleKey) {
+      event.stopPropagation();
+
+      const targetTrack = document.getElementById(`track-${linePrefix}`);
+      if (!targetTrack.classList.contains('active')) {
+        toggleTrain(`track-${linePrefix}`);
+      } else {
+        triggerPantographSpark(targetTrack);
+      }
+
+      // Fecha as portas dos outros vagões e abre apenas a do vagão selecionado
+      document.querySelectorAll('.wagon-item').forEach(btn => {
+        btn.classList.remove('selected-menu');
+      });
+      event.currentTarget.classList.add('selected-menu');
+
+      // Atualiza o Letreiro Digital LED Matrix da cabine correspondente
+      const data = saasModules[moduleKey];
+      if (data) {
+        const ledEl = document.getElementById(`led-text-${linePrefix}`);
+        if (ledEl) {
+          ledEl.textContent = data.ledLabel;
+        }
+      }
+
+      renderModuleContent(moduleKey);
+    }
+
+    /**
+     * Atualiza os dados do painel SaaS abaixo dos trilhos
+     */
+    function renderModuleContent(moduleKey) {
+      const data = saasModules[moduleKey];
+      if (!data) return;
+
+      const badge = document.getElementById('content-badge');
+      badge.textContent = data.line.toUpperCase();
+      badge.style.backgroundColor = data.color;
+      badge.style.color = data.line === 'l8' ? '#0f172a' : '#ffffff';
+
+      document.getElementById('content-title').textContent = data.title;
+      document.getElementById('content-subtitle').textContent = data.subtitle;
+
+      const lineTag = document.getElementById('content-line-tag');
+      lineTag.textContent = data.lineName;
+      lineTag.style.borderColor = data.color;
+      lineTag.style.color = data.line === 'l8' ? '#cbd5e1' : '#2dd4bf';
+
+      const cardsContainer = document.getElementById('content-cards');
+      cardsContainer.innerHTML = data.cards.map(card => `
+        <div class="bg-slate-950/80 border border-slate-800/90 hover:border-slate-700 p-5 rounded-xl transition group">
+          <div class="flex items-center justify-between text-slate-400 mb-3">
+            <span class="text-xs font-semibold uppercase tracking-wider">${card.label}</span>
+            <div class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center" style="color: ${data.color}">
+              <i data-lucide="${card.icon}" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="text-2xl font-extrabold text-white tracking-tight">${card.value}</div>
+          <div class="text-xs font-medium mt-2 flex items-center gap-1.5" style="color: ${data.color}">
+            <span>●</span>
+            <span>${card.trend}</span>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    /**
+     * Abre/Fecha o modal com o código fonte completo desta página
+     */
+    function toggleCodeModal() {
+      const modal = document.getElementById('code-modal');
+      const snippetEl = document.getElementById('code-snippet');
+      if (snippetEl && !snippetEl.textContent) {
+        snippetEl.textContent = document.documentElement.outerHTML;
+      }
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    /**
+     * Copia o código para a área de transferência usando document.execCommand('copy')
+     */
+    function copySnippet() {
+      const codeText = document.getElementById('code-snippet').textContent;
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = codeText;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextArea);
+
+      const copyBtn = document.getElementById('copy-btn');
+      copyBtn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Copiado!</span>';
+      lucide.createIcons();
+
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copiar Código</span>';
+        lucide.createIcons();
+      }, 2000);
+    }
+
+    // Inicializa ícones e o primeiro módulo ao carregar
+    window.addEventListener('DOMContentLoaded', () => {
+      renderModuleContent('dashboard');
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

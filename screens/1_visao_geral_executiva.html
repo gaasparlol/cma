@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RailPulse - ViaMobilidade Linhas 8 &amp; 9 Analytics</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#0f131d",
+            "surface-container-low": "#171b26",
+            "surface-variant": "#313540",
+            "on-secondary-fixed": "#001f26",
+            "primary-fixed": "#6ffbbe",
+            "secondary-fixed": "#acedff",
+            "on-primary-fixed-variant": "#005236",
+            "surface-container": "#1c1f2a",
+            "on-tertiary-fixed": "#001e2c",
+            "tertiary": "#7bd0ff",
+            "inverse-on-surface": "#2c303b",
+            "on-tertiary": "#00354a",
+            "on-surface": "#dfe2f1",
+            "on-secondary-fixed-variant": "#004e5c",
+            "on-primary-fixed": "#002113",
+            "on-secondary-container": "#00424e",
+            "surface-container-high": "#262a35",
+            "tertiary-fixed-dim": "#7bd0ff",
+            "outline-variant": "#3c4a42",
+            "primary-container": "#10b981",
+            "error": "#ffb4ab",
+            "on-primary-container": "#00422b",
+            "surface-tint": "#4edea3",
+            "surface-container-lowest": "#0a0e18",
+            "surface-bright": "#353944",
+            "tertiary-container": "#19aee8",
+            "on-tertiary-container": "#003e55",
+            "surface": "#0f131d",
+            "inverse-primary": "#006c49",
+            "inverse-surface": "#dfe2f1",
+            "on-error": "#690005",
+            "on-background": "#dfe2f1",
+            "error-container": "#93000a",
+            "on-error-container": "#ffdad6",
+            "outline": "#86948a",
+            "surface-container-highest": "#313540",
+            "primary": "#4edea3",
+            "background": "#0f131d",
+            "secondary": "#4cd7f6",
+            "on-surface-variant": "#bbcabf",
+            "tertiary-fixed": "#c4e7ff",
+            "primary-fixed-dim": "#4edea3",
+            "secondary-container": "#03b5d3",
+            "on-tertiary-fixed-variant": "#004c69",
+            "on-secondary": "#003640",
+            "secondary-fixed-dim": "#4cd7f6",
+            "on-primary": "#003824"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-desktop": "1.5rem",
+            "margin": "1rem",
+            "margin-desktop": "2rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "space-xs": "0.25rem",
+            "space-2xl": "3rem",
+            "space-sm": "0.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-xl-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "telemetry-mono": ["Inter"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "metric-display": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "headline-sm": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "telemetry-mono": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.03em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      display: inline-block;
+      line-height: 1;
+    }
+    
+    /* Background grid telemetry texture */
+    .telemetry-grid {
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    
+    .pulse-glow-l9 {
+      box-shadow: 0 0 16px -2px rgba(16, 185, 129, 0.35);
+    }
+    
+    .pulse-glow-l8 {
+      box-shadow: 0 0 16px -2px rgba(6, 182, 212, 0.35);
+    }
+    
+    @keyframes subtlePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.96); }
+    }
+    .animate-pulse-slow {
+      animation: subtlePulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-surface-dim text-on-surface min-h-screen telemetry-grid antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TOP APP BAR (Shared Components JSON Anchor) -->
+<header class="bg-surface-container-low/80 dark:bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/20 shadow-sm backdrop-blur-xl docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-space-xl h-16">
+<!-- Brand & Subtitle -->
+<div class="flex items-center gap-6">
+<div class="text-headline-md font-headline-md font-bold text-on-surface tracking-tight flex items-center gap-2.5">
+<!-- Bullet train SVG emblem -->
+<div class="w-9 h-9 rounded-xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-primary shadow-inner">
+<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+<line x1="4" x2="4" y1="22" y2="15"></line>
+<line x1="12" x2="12" y1="18" y2="22"></line>
+<line x1="20" x2="20" y1="18" y2="22"></line>
+<circle cx="8" cy="9" fill="currentColor" r="1"></circle>
+<circle cx="16" cy="9" fill="currentColor" r="1"></circle>
+</svg>
+</div>
+<div class="flex flex-col">
+<span class="leading-none text-on-surface font-headline-md font-bold tracking-tight">RailPulse</span>
+<span class="text-[10px] font-label-sm uppercase tracking-widest text-on-surface-variant font-medium mt-0.5">ViaMobilidade • Linhas 8 &amp; 9</span>
+</div>
+</div>
+<!-- Global Navigation Links (JSON Authority) -->
+<nav class="hidden xl:flex items-center gap-6 ml-4 border-l border-outline-variant/30 pl-6 h-8">
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md" href="#">Visão Geral</a>
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary font-semibold py-3 transition-colors text-label-md font-label-md flex items-center gap-1.5" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
+            Linhas 8 &amp; 9
+          </a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md" href="#">Telemetria</a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md" href="#">Previsões</a>
+<a class="text-on-surface-variant hover:text-on-surface py-3 transition-colors text-label-md font-label-md" href="#">Relatórios</a>
+</nav>
+</div>
+<!-- Center Active Dataset Pill -->
+<div class="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/30 text-body-sm font-telemetry-mono text-on-surface-variant">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<span class="text-on-surface font-medium">Active Data:</span>
+<span class="text-primary-fixed">MD.xlsx (Base_Diaria 2022-2026)</span>
+<span class="text-outline">•</span>
+<span class="text-on-surface font-telemetry-mono">1,678 daily records</span>
+</div>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Quick Trailing Actions -->
+<button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-low hover:bg-surface-container text-on-surface text-label-md font-label-md transition-all active:scale-95">
+<span class="material-symbols-outlined text-[16px] text-tertiary">tune</span>
+          Filtro Temporal
+        </button>
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary-container hover:bg-primary font-headline-sm text-label-md transition-all active:scale-95 shadow-md pulse-glow-l9">
+<span class="material-symbols-outlined text-[18px]">download</span>
+          Exportar Relatório
+        </button>
+<!-- Icon Actions from JSON -->
+<div class="flex items-center gap-1 pl-2 border-l border-outline-variant/20">
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/40 flex items-center justify-center ml-1 text-primary font-bold text-xs" title="Foto de perfil do Operador de Tráfego">
+            NOC
+          </div>
+</div>
+</div>
+</div>
+</header>
+<!-- WORKSPACE WRAPPER (Sidebar + Main Dashboard) -->
+<div class="flex w-full">
+<!-- SIDEBAR NAV (Shared Components JSON Anchor) -->
+<aside class="hidden lg:flex flex-col justify-between h-[calc(100vh-4rem)] p-space-md w-64 border-r border-outline-variant/30 shrink-0 bg-surface-container-lowest dark:bg-surface-dim sticky top-16 shadow-lg">
+<div class="flex flex-col gap-6">
+<!-- Header Info in Sidebar -->
+<div class="px-space-md py-2 rounded-lg bg-surface-container-low border border-outline-variant/20">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-md bg-surface-container-high border border-secondary/30 flex items-center justify-center text-secondary font-bold text-xs">
+              VM
+            </div>
+<div class="flex flex-col">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">ViaMobilidade</span>
+<span class="text-[11px] text-on-surface-variant font-label-sm">Linhas 8 e 9 • Operação Ativa</span>
+</div>
+</div>
+</div>
+<!-- Tab Links (JSON Authority) -->
+<nav class="flex flex-col gap-1.5">
+<a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg bg-surface-container text-primary font-semibold border-l-2 border-primary" href="#">
+<span class="material-symbols-outlined text-[20px]">monitoring</span>
+<span class="text-label-md font-label-md">Monitoramento</span>
+</a>
+<a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">timeline</span>
+<span class="text-label-md font-label-md">Diagrama de Vias</span>
+</a>
+<a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+<span class="text-label-md font-label-md">Alertas de IA</span>
+<span class="ml-auto px-1.5 py-0.5 rounded text-[10px] bg-error-container text-error font-telemetry-mono">2</span>
+</a>
+<a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="text-label-md font-label-md">Análise de Demanda</span>
+</a>
+<a class="flex items-center gap-3 px-space-md py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="text-label-md font-label-md">Configurações</span>
+</a>
+</nav>
+<!-- CTA in JSON -->
+<div class="px-2 pt-2">
+<button class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg bg-surface-container-high hover:bg-surface-variant border border-secondary/30 text-secondary font-headline-sm text-body-sm transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">alt_route</span>
+            Modo Despacho
+          </button>
+</div>
+</div>
+<!-- Footer Navigation Items (JSON Authority) -->
+<div class="flex flex-col gap-2 pt-4 border-t border-outline-variant/30">
+<a class="flex items-center gap-3 px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-body-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">headset_mic</span>
+<span class="text-label-md font-label-md">Suporte NOC</span>
+</a>
+<a class="flex items-center gap-3 px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-body-sm" href="#">
+<span class="material-symbols-outlined text-[18px] text-primary">sensors</span>
+<span class="text-label-md font-label-md">Status da Rede</span>
+<span class="ml-auto w-2 h-2 rounded-full bg-primary"></span>
+</a>
+</div>
+</aside>
+<!-- MAIN DASHBOARD CONTENT CANVAS -->
+<main class="flex-1 p-space-md lg:p-space-xl overflow-y-auto space-y-6 max-w-[1720px] mx-auto">
+<!-- SUBHEADER / TOOLBAR & FILTERS -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-space-md rounded-xl bg-surface-container-low/70 border border-outline-variant/20 backdrop-blur-md">
+<!-- Left: Quick Date Filters & Day Type Segment -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Date Range Pills -->
+<div class="inline-flex rounded-lg p-1 bg-surface-container-lowest border border-outline-variant/30 text-label-md font-label-md">
+<button class="px-3 py-1.5 rounded bg-surface-container-high text-primary font-medium shadow-sm transition-all">2022-2026</button>
+<button class="px-3 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Últimos 30 Dias</button>
+<button class="px-3 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Ano Atual (YTD)</button>
+</div>
+<div class="h-6 w-px bg-outline-variant/30 hidden sm:block"></div>
+<!-- Day Type Segmented Toggle -->
+<div class="inline-flex rounded-lg p-1 bg-surface-container-lowest border border-outline-variant/30 text-label-md font-label-md">
+<button class="px-2.5 py-1.5 rounded bg-surface-container-high text-on-surface font-medium transition-all">Todos</button>
+<button class="px-2.5 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Dias Úteis</button>
+<button class="px-2.5 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Fins de Semana / Feriados</button>
+</div>
+</div>
+<!-- Right: Primary Action Buttons -->
+<div class="flex items-center gap-2.5">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-outline-variant/40 bg-surface-container-lowest hover:bg-surface-container text-on-surface text-label-md font-label-md transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px] text-tertiary">upload_file</span>
+            Upload novo XLSX
+          </button>
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-gradient-to-r from-primary-container to-primary text-on-primary-container font-headline-sm text-label-md shadow-md hover:brightness-105 active:scale-95 pulse-glow-l9 transition-all">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            Exportar PDF Executivo
+          </button>
+</div>
+</div>
+<!-- TOP KPI METRIC CARDS (4 in a row with telemetry glassmorphism) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+<!-- CARD 1: Total Passengers -->
+<div class="p-space-md rounded-xl bg-surface-container-low/75 border border-outline-variant/30 relative overflow-hidden backdrop-blur-md flex flex-col justify-between group hover:border-primary/40 transition-all">
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-primary-fixed to-transparent opacity-80"></div>
+<div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant">Total Passageiros (L8 &amp; L9)</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                +4.2% YoY
+              </span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-on-surface">360.8K</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">/ dia médio</span>
+</div>
+<div class="text-[12px] font-telemetry-mono text-outline mt-0.5">Pico Registrado: <span class="text-primary-fixed">480.9K</span></div>
+</div>
+<!-- Micro Visual Sparkline -->
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-end gap-1 h-8">
+<div class="w-full bg-primary/20 hover:bg-primary/50 rounded-xs h-3 transition-all"></div>
+<div class="w-full bg-primary/30 hover:bg-primary/50 rounded-xs h-5 transition-all"></div>
+<div class="w-full bg-primary/40 hover:bg-primary/50 rounded-xs h-4 transition-all"></div>
+<div class="w-full bg-primary/35 hover:bg-primary/50 rounded-xs h-6 transition-all"></div>
+<div class="w-full bg-primary/50 hover:bg-primary/50 rounded-xs h-7 transition-all"></div>
+<div class="w-full bg-primary/60 hover:bg-primary/50 rounded-xs h-5 transition-all"></div>
+<div class="w-full bg-primary/80 hover:bg-primary/50 rounded-xs h-8 transition-all"></div>
+<div class="w-full bg-primary rounded-xs h-9 shadow-sm"></div>
+</div>
+</div>
+<!-- CARD 2: Estimated Revenue -->
+<div class="p-space-md rounded-xl bg-surface-container-low/75 border border-outline-variant/30 relative overflow-hidden backdrop-blur-md flex flex-col justify-between group hover:border-tertiary/40 transition-all">
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-tertiary via-secondary to-transparent opacity-80"></div>
+<div>
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant">Receita Estimada (L8 &amp; L9)</span>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-tertiary bg-tertiary/10 px-2 py-0.5 rounded border border-tertiary/20">
+<span class="material-symbols-outlined text-[14px]">payments</span>
+                R$ 2.503/ent
+              </span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-on-surface">R$ 903.0K</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">/ dia médio</span>
+</div>
+<div class="text-[12px] font-telemetry-mono text-outline mt-0.5">Yield Tarifa: <span class="text-secondary-fixed">Consistência 99.1%</span></div>
+</div>
+<!-- Smooth SVG Trendline Sparkline -->
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center h-8">
+<svg class="w-full h-7 overflow-visible" fill="none" viewbox="0 0 120 28">
+<path d="M0 24 C 20 22, 35 12, 50 16 C 65 20, 80 6, 95 10 C 110 4, 115 2, 120 1" stroke="#38bdf8" stroke-linecap="round" stroke-width="2"></path>
+<path d="M0 24 C 20 22, 35 12, 50 16 C 65 20, 80 6, 95 10 C 110 4, 115 2, 120 1 L 120 28 L 0 28 Z" fill="url(#blue-grad)" opacity="0.18"></path>
+<defs>
+<lineargradient id="blue-grad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#38bdf8"></stop>
+<stop offset="100%" stop-color="#38bdf8" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+</div>
+<!-- CARD 3: Linha 8 - Diamante -->
+<div class="p-space-md rounded-xl bg-surface-container-low/75 border border-outline-variant/30 relative overflow-hidden backdrop-blur-md flex flex-col justify-between group hover:border-secondary/40 transition-all">
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary-container via-secondary to-transparent"></div>
+<div>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Linha 8 • Diamante
+              </span>
+<span class="text-[11px] font-telemetry-mono text-on-surface-variant">34 trens ativos</span>
+</div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-on-surface">275.3K</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">pass./dia</span>
+</div>
+<div class="text-[12px] font-telemetry-mono text-outline mt-0.5">23 estações operacionais</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex flex-wrap gap-1.5 text-[11px] font-label-sm text-on-surface-variant">
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Osasco</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Barueri</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Barra Funda</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Amador Bueno</span>
+</div>
+</div>
+<!-- CARD 4: Linha 9 - Esmeralda -->
+<div class="p-space-md rounded-xl bg-surface-container-low/75 border border-outline-variant/30 relative overflow-hidden backdrop-blur-md flex flex-col justify-between group hover:border-primary/40 transition-all">
+<div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-container via-primary to-transparent"></div>
+<div>
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                Linha 9 • Esmeralda
+              </span>
+<span class="text-[11px] font-telemetry-mono text-on-surface-variant">28 trens ativos</span>
+</div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="text-metric-display font-metric-display text-on-surface">85.5K</span>
+<span class="text-body-sm font-body-sm text-on-surface-variant">pass./dia</span>
+</div>
+<div class="text-[12px] font-telemetry-mono text-outline mt-0.5">21 estações operacionais</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex flex-wrap gap-1.5 text-[11px] font-label-sm text-on-surface-variant">
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Vila Olímpia</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Pinheiros</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Berrini</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30">Sto. Amaro</span>
+</div>
+</div>
+</div>
+<!-- MAIN BENTO GRID: DIAGRAM + CHARTS (LEFT/CENTER) & AI INSIDERS (RIGHT) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- LEFT & CENTER (8 COLUMNS ON DESKTOP) -->
+<div class="lg:col-span-8 space-y-6">
+<!-- SECTION 1: RAILWAY SCHEMATIC LINE MAP VISUALIZER -->
+<div class="p-space-md lg:p-space-lg rounded-2xl bg-surface-container-low/80 border border-outline-variant/30 backdrop-blur-md relative overflow-hidden">
+<!-- Schematic Header & Controls -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-outline-variant/20">
+<div>
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">schema</span>
+                  Diagrama Esquemático de Linhas &amp; Nodos de Integração
+                </h3>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">
+                  Topologia operacional com densidade volumétrica em tempo real nas Linhas 8 e 9.
+                </p>
+</div>
+<!-- Schematic Controls & Toggles -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Exibir Densidade de Fluxo</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Legend Pill Bar -->
+<div class="flex flex-wrap items-center gap-4 py-3 text-label-sm font-label-sm">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded bg-secondary shadow-sm"></span>
+<span class="text-on-surface">Linha 8 (Diamante)</span>
+<span class="text-outline font-telemetry-mono">(Amador Bueno ↔ Barra Funda)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded bg-primary shadow-sm"></span>
+<span class="text-on-surface">Linha 9 (Esmeralda)</span>
+<span class="text-outline font-telemetry-mono">(Osasco ↔ Mendes-Vila Natal)</span>
+</div>
+<div class="flex items-center gap-2 ml-auto">
+<span class="w-2.5 h-2.5 rounded-full border-2 border-white bg-surface-dim"></span>
+<span class="text-on-surface-variant">Hub de Integração</span>
+</div>
+</div>
+<!-- SVG SCHEMATIC CANVAS -->
+<div class="w-full bg-surface-container-lowest/80 rounded-xl p-4 border border-outline-variant/30 overflow-x-auto relative">
+<svg class="w-full min-w-[760px] h-auto select-none" fill="none" viewbox="0 0 880 340" xmlns="http://www.w3.org/2000/svg">
+<!-- Background Grid Accent lines -->
+<line stroke="#1e293b" stroke-dasharray="4 6" stroke-width="1" x1="40" x2="840" y1="90" y2="90"></line>
+<line stroke="#1e293b" stroke-dasharray="4 6" stroke-width="1" x1="40" x2="840" y1="210" y2="210"></line>
+<!-- Connection Curve between L8 & L9 at Osasco/Pres Altino -->
+<path d="M 360 90 L 390 140 L 410 210" opacity="0.6" stroke="#4cd7f6" stroke-dasharray="2 3" stroke-linecap="round" stroke-width="3"></path>
+<!-- ================= LINHA 8 (DIAMANTE) - CYAN TRACK ================= -->
+<!-- Main Line 8 Track -->
+<line stroke="#06b6d4" stroke-linecap="round" stroke-width="6" x1="60" x2="820" y1="90" y2="90"></line>
+<line opacity="0.9" stroke="#4cd7f6" stroke-linecap="round" stroke-width="2" x1="60" x2="820" y1="90" y2="90"></line>
+<!-- Station Nodes Linha 8 -->
+<!-- Amador Bueno -->
+<g class="cursor-pointer group">
+<circle cx="90" cy="90" fill="#0b0f19" r="6" stroke="#06b6d4" stroke-width="3"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="11" font-weight="500" text-anchor="middle" x="90" y="70">Amador Bueno</text>
+<text fill="#64748b" font-family="Inter" font-size="9" text-anchor="middle" x="90" y="112">REGULAR</text>
+</g>
+<!-- Itapevi -->
+<g class="cursor-pointer">
+<circle cx="170" cy="90" fill="#0b0f19" r="4.5" stroke="#06b6d4" stroke-width="2.5"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="11" text-anchor="middle" x="170" y="70">Itapevi</text>
+</g>
+<!-- Barueri -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="260" cy="90" fill="rgba(6, 182, 212, 0.12)" r="16"></circle>
+<circle cx="260" cy="90" fill="#0b0f19" r="7" stroke="#38bdf8" stroke-width="3"></circle>
+<text fill="#dfe2f1" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="260" y="68">Barueri</text>
+<text fill="#38bdf8" font-family="Inter" font-size="9" font-weight="600" text-anchor="middle" x="260" y="114">MED • 28K/d</text>
+</g>
+<!-- Osasco (INTERCHANGE HUB L8 & L9) -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="360" cy="90" fill="rgba(6, 182, 212, 0.2)" r="22"></circle>
+<rect fill="#0b0f19" height="24" rx="6" stroke="#ffffff" stroke-width="3" width="24" x="348" y="78"></rect>
+<circle cx="360" cy="90" fill="#38bdf8" r="4"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="13" font-weight="700" text-anchor="middle" x="360" y="62">Osasco (Hub)</text>
+<text fill="#4edea3" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="360" y="122">INT L8 ↔ L9</text>
+</g>
+<!-- Presidente Altino (INTERCHANGE) -->
+<g class="cursor-pointer">
+<rect fill="#0b0f19" height="20" rx="5" stroke="#ffffff" stroke-width="2" width="20" x="424" y="80"></rect>
+<text fill="#dfe2f1" font-family="Inter" font-size="11" font-weight="600" text-anchor="middle" x="434" y="66">Pres. Altino</text>
+<text fill="#64748b" font-family="Inter" font-size="9" text-anchor="middle" x="434" y="116">Conexão L8/L9</text>
+</g>
+<!-- Lapa -->
+<g class="cursor-pointer">
+<circle cx="580" cy="90" fill="#0b0f19" r="5" stroke="#06b6d4" stroke-width="2.5"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="11" text-anchor="middle" x="580" y="70">Lapa</text>
+</g>
+<!-- Palmeiras-Barra Funda (MAJOR TERMINAL) -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="760" cy="90" fill="rgba(6, 182, 212, 0.25)" r="24"></circle>
+<rect fill="#0b0f19" height="28" rx="7" stroke="#ffffff" stroke-width="3.5" width="28" x="746" y="76"></rect>
+<circle cx="760" cy="90" fill="#06b6d4" r="5"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="13" font-weight="700" text-anchor="middle" x="760" y="60">Palmeiras-Barra Funda</text>
+<text fill="#7bd0ff" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="760" y="124">L7 / L3 / CPTM</text>
+</g>
+<!-- ================= LINHA 9 (ESMERALDA) - EMERALD TRACK ================= -->
+<!-- Main Line 9 Track (Starts from Osasco / Pres Altino diagonal and heads south) -->
+<path d="M 360 110 Q 380 180 430 210 L 820 210" stroke="#10b981" stroke-linecap="round" stroke-width="6"></path>
+<path d="M 360 110 Q 380 180 430 210 L 820 210" opacity="0.9" stroke="#4edea3" stroke-linecap="round" stroke-width="2"></path>
+<!-- Station Nodes Linha 9 -->
+<!-- Ceasa / Villa Lobos -->
+<g class="cursor-pointer">
+<circle cx="470" cy="210" fill="#0b0f19" r="5" stroke="#10b981" stroke-width="2.5"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="11" text-anchor="middle" x="470" y="234">Villa-Lobos</text>
+</g>
+<!-- Pinheiros (CONEXÃO L4 AMARELA - VERY HIGH) -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="540" cy="210" fill="rgba(16, 185, 129, 0.3)" r="26"></circle>
+<rect fill="#0b0f19" height="28" rx="7" stroke="#facc15" stroke-width="3.5" width="28" x="526" y="196"></rect>
+<circle cx="540" cy="210" fill="#10b981" r="5"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="13" font-weight="700" text-anchor="middle" x="540" y="184">Pinheiros</text>
+<text fill="#facc15" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="540" y="244">INT L4 Amarela</text>
+<text fill="#4edea3" font-family="Inter" font-size="9" font-weight="700" text-anchor="middle" x="540" y="258">PICO EXTREMO</text>
+</g>
+<!-- Hebraica-Rebouças -->
+<g class="cursor-pointer">
+<circle cx="610" cy="210" fill="#0b0f19" r="4.5" stroke="#10b981" stroke-width="2"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle" x="610" y="234">Heb-Rebouças</text>
+</g>
+<!-- Vila Olímpia (HIGH CORPORATE) -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="670" cy="210" fill="rgba(16, 185, 129, 0.22)" r="18"></circle>
+<circle cx="670" cy="210" fill="#0b0f19" r="7" stroke="#4edea3" stroke-width="3"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="670" y="186">Vila Olímpia</text>
+<text fill="#4edea3" font-family="Inter" font-size="9" font-weight="700" text-anchor="middle" x="670" y="236">7.8M pass. (HIGH)</text>
+</g>
+<!-- Berrini -->
+<g class="cursor-pointer">
+<circle cx="720" cy="210" fill="#0b0f19" r="5" stroke="#10b981" stroke-width="2.5"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="11" text-anchor="middle" x="720" y="234">Berrini</text>
+<text fill="#64748b" font-family="Inter" font-size="8.5" text-anchor="middle" x="720" y="247">Corporativo</text>
+</g>
+<!-- Santo Amaro (CONEXÃO L5 LILÁS) -->
+<g class="cursor-pointer group">
+<circle class="animate-pulse" cx="780" cy="210" fill="rgba(16, 185, 129, 0.25)" r="20"></circle>
+<rect fill="#0b0f19" height="24" rx="6" stroke="#a855f7" stroke-width="3" width="24" x="768" y="198"></rect>
+<circle cx="780" cy="210" fill="#4edea3" r="4"></circle>
+<text fill="#ffffff" font-family="Inter" font-size="12" font-weight="600" text-anchor="middle" x="780" y="186">Santo Amaro</text>
+<text fill="#c084fc" font-family="Inter" font-size="9.5" font-weight="600" text-anchor="middle" x="780" y="240">INT L5 Lilás</text>
+</g>
+<!-- Grajaú / Mendes-Vila Natal Indicator -->
+<g class="cursor-pointer">
+<path d="M 820 210 L 850 210" stroke="#10b981" stroke-dasharray="3 3" stroke-width="4"></path>
+<circle cx="850" cy="210" fill="#0b0f19" r="5" stroke="#10b981" stroke-width="2.5"></circle>
+<text fill="#94a3b8" font-family="Inter" font-size="10" text-anchor="middle" x="850" y="234">Mendes-Vila Natal</text>
+</g>
+</svg>
+<!-- Real-time Live Badge overlay -->
+<div class="absolute bottom-3 right-3 flex items-center gap-2 bg-surface-container/90 border border-outline-variant/40 px-3 py-1.5 rounded-lg text-[11px] font-telemetry-mono text-on-surface-variant backdrop-blur-md">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span>Intervalo Médio (Headway): <strong class="text-on-surface font-semibold">4m 12s</strong></span>
+</div>
+</div>
+</div>
+<!-- SECTION 2: INTERACTIVE MULTI-METRIC CHART -->
+<div class="p-space-md lg:p-space-lg rounded-2xl bg-surface-container-low/80 border border-outline-variant/30 backdrop-blur-md relative">
+<!-- Chart Header & Interactive Controls -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-outline-variant/20">
+<!-- Tab Switcher -->
+<div class="inline-flex rounded-lg p-1 bg-surface-container-lowest border border-outline-variant/30 text-label-md font-label-md">
+<button class="px-3 py-1.5 rounded bg-surface-container-high text-primary font-medium shadow-sm transition-all">Evolução Temporal (2022-2026)</button>
+<button class="px-3 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Comparativo por Linha</button>
+<button class="px-3 py-1.5 rounded text-on-surface-variant hover:text-on-surface transition-all">Heatmap Semanal (Pico)</button>
+</div>
+<!-- Zoom Range Selector & Metric Swatches -->
+<div class="flex items-center gap-3">
+<div class="inline-flex rounded bg-surface-container-lowest border border-outline-variant/30 p-0.5 text-[11px] font-telemetry-mono text-on-surface-variant">
+<button class="px-2 py-1 rounded hover:text-on-surface">1M</button>
+<button class="px-2 py-1 rounded hover:text-on-surface">6M</button>
+<button class="px-2 py-1 rounded hover:text-on-surface">1A</button>
+<button class="px-2 py-1 rounded bg-surface-container-high text-primary font-bold">Tudo</button>
+</div>
+</div>
+</div>
+<!-- Chart Metric Legends & Real-time Tooltip Mockup -->
+<div class="flex flex-wrap items-center justify-between gap-4 py-3">
+<div class="flex items-center gap-4 text-body-sm font-label-sm">
+<label class="flex items-center gap-2 cursor-pointer">
+<span class="w-3 h-0.5 bg-secondary-fixed-dim"></span>
+<span class="text-on-surface">Linha 8 (Diamante) Entradas</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<span class="w-3 h-0.5 bg-primary"></span>
+<span class="text-on-surface">Linha 9 (Esmeralda) Entradas</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<span class="w-3 h-0.5 bg-tertiary border-t border-dashed"></span>
+<span class="text-on-surface-variant">Curva de Receita (R$)</span>
+</label>
+</div>
+<!-- Interactive hover coordinate -->
+<div class="text-[12px] font-telemetry-mono text-on-surface-variant">
+                Ponto Selecionado: <span class="text-primary font-medium">14/Nov/2024 (Quinta-feira)</span>
+</div>
+</div>
+<!-- Multi-Series Vector Chart -->
+<div class="w-full h-64 bg-surface-container-lowest/70 rounded-xl p-4 border border-outline-variant/30 relative flex flex-col justify-between">
+<!-- Simulated Grid Lines & Labels -->
+<div class="absolute inset-x-4 inset-y-4 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="w-full border-b border-on-surface flex justify-between text-[10px] text-on-surface"><span>450K</span></div>
+<div class="w-full border-b border-on-surface flex justify-between text-[10px] text-on-surface"><span>350K</span></div>
+<div class="w-full border-b border-on-surface flex justify-between text-[10px] text-on-surface"><span>250K</span></div>
+<div class="w-full border-b border-on-surface flex justify-between text-[10px] text-on-surface"><span>150K</span></div>
+<div class="w-full border-b border-on-surface flex justify-between text-[10px] text-on-surface"><span>50K</span></div>
+</div>
+<!-- SVG Visual Dual Line Series -->
+<svg class="w-full h-full overflow-visible z-10" preserveaspectratio="none" viewbox="0 0 600 200">
+<defs>
+<lineargradient id="l8-grad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#06b6d4" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#06b6d4" stop-opacity="0"></stop>
+</lineargradient>
+<lineargradient id="l9-grad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#10b981" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#10b981" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Linha 8 Area & Stroke -->
+<path d="M 0 110 Q 50 95, 100 100 T 200 80 T 300 90 T 400 70 T 500 85 T 600 65 L 600 200 L 0 200 Z" fill="url(#l8-grad)"></path>
+<path d="M 0 110 Q 50 95, 100 100 T 200 80 T 300 90 T 400 70 T 500 85 T 600 65" fill="none" stroke="#06b6d4" stroke-width="2.5"></path>
+<!-- Linha 9 Area & Stroke -->
+<path d="M 0 160 Q 50 150, 100 155 T 200 140 T 300 145 T 400 130 T 500 138 T 600 120 L 600 200 L 0 200 Z" fill="url(#l9-grad)"></path>
+<path d="M 0 160 Q 50 150, 100 155 T 200 140 T 300 145 T 400 130 T 500 138 T 600 120" fill="none" stroke="#10b981" stroke-width="2.5"></path>
+<!-- Active Vertical Scrubbing Crosshair at X=420 -->
+<line stroke="#bbcabf" stroke-dasharray="3 3" stroke-width="1.5" x1="420" x2="420" y1="0" y2="200"></line>
+<!-- Intersect Points -->
+<circle cx="420" cy="73" fill="#06b6d4" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="420" cy="132" fill="#10b981" r="5" stroke="#ffffff" stroke-width="2"></circle>
+</svg>
+<!-- Floating Tooltip Box at Scrubbing Position -->
+<div class="absolute left-[62%] top-6 bg-surface-container-high/95 border border-outline-variant/50 p-2.5 rounded-lg shadow-2xl backdrop-blur-md z-20 pointer-events-none min-w-[170px]">
+<div class="text-[11px] font-semibold text-on-surface border-b border-outline-variant/30 pb-1">Novembro / 2024</div>
+<div class="mt-1 flex items-center justify-between text-body-sm font-telemetry-mono">
+<span class="text-secondary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> L8:</span>
+<span class="text-on-surface font-semibold">278.4K pass.</span>
+</div>
+<div class="mt-0.5 flex items-center justify-between text-body-sm font-telemetry-mono">
+<span class="text-primary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span> L9:</span>
+<span class="text-on-surface font-semibold">89.2K pass.</span>
+</div>
+<div class="mt-1 pt-1 border-t border-outline-variant/30 flex items-center justify-between text-[11px] font-telemetry-mono">
+<span class="text-tertiary">Receita:</span>
+<span class="text-on-surface font-semibold">R$ 919.8K</span>
+</div>
+</div>
+<!-- Time axis bottom labels -->
+<div class="flex justify-between text-[11px] font-telemetry-mono text-outline z-10 pt-1">
+<span>Jan 2022</span>
+<span>Jul 2022</span>
+<span>Jan 2023</span>
+<span>Jul 2023</span>
+<span>Jan 2024</span>
+<span class="text-on-surface font-semibold">Nov 2024 (Hoje)</span>
+<span>2025 (Proj)</span>
+<span>2026 (Proj)</span>
+</div>
+</div>
+<!-- Summary Statistics Sub-Bar -->
+<div class="mt-4 pt-4 border-t border-outline-variant/20 grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">show_chart</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm uppercase text-outline">Média Móvel (7 Dias)</div>
+<div class="text-headline-sm font-telemetry-mono text-on-surface">364,120 <span class="text-[11px] text-primary">pass/dia</span></div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[18px]">equalizer</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm uppercase text-outline">Desvio Padrão Semanal</div>
+<div class="text-headline-sm font-telemetry-mono text-on-surface">± 14.8K <span class="text-[11px] text-on-surface-variant">(σ = 4.1%)</span></div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+</div>
+<div>
+<div class="text-[11px] font-label-sm uppercase text-outline">Índice de Pontualidade</div>
+<div class="text-headline-sm font-telemetry-mono text-primary font-bold">98.4% <span class="text-[11px] text-on-surface-variant">(Meta: 98.0%)</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT SIDEBAR (4 COLUMNS ON DESKTOP) - 'Rail Insiders & AI Detection' -->
+<div class="lg:col-span-4 space-y-6">
+<!-- AI DETECTIONS CONTAINER -->
+<div class="p-space-md lg:p-space-lg rounded-2xl bg-surface-container-low/80 border border-outline-variant/30 backdrop-blur-md space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">smart_toy</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Rail Insiders &amp; AI</h3>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] bg-primary/10 text-primary border border-primary/20 font-telemetry-mono">
+                Live Heuristics
+              </span>
+</div>
+<!-- AI Anomaly 1: Autódromo Event Surge -->
+<div class="p-3.5 rounded-xl bg-surface-container/70 border border-secondary-container/40 relative overflow-hidden group hover:border-secondary transition-all">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-lg bg-secondary/15 text-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-label-md font-semibold text-secondary">Pico Detectado em Autódromo (L9)</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface leading-snug">
+<strong class="text-primary">+180%</strong> em finais de semana de eventos (GP Brasil de F1 &amp; Festivais de Música).
+                  </p>
+<div class="pt-1.5 flex items-center justify-between">
+<a class="inline-flex items-center gap-1 text-[12px] font-label-md text-tertiary hover:underline" href="#">
+                      Analisar Impacto
+                      <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+<span class="text-[10px] font-telemetry-mono text-outline">Intervalo reduzido para 3m30s</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Anomaly 2: Vila Olímpia & Berrini Weekend Drop -->
+<div class="p-3.5 rounded-xl bg-surface-container/70 border border-outline-variant/40 relative overflow-hidden group hover:border-primary/40 transition-all">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-label-md font-semibold text-primary">Padrão Corporativo Faria Lima</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface leading-snug">
+                    Queda acentuada de <strong class="text-error">62%</strong> no fluxo de passageiros em Vila Olímpia e Berrini durante sábados, domingos e feriados.
+                  </p>
+<div class="pt-1 text-[11px] font-telemetry-mono text-on-surface-variant flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Recomendação: Redistribuição de frota para trecho sul.
+                  </div>
+</div>
+</div>
+</div>
+</div>
+<!-- TOP 5 BUSIEST STATIONS RANKING -->
+<div class="p-space-md lg:p-space-lg rounded-2xl bg-surface-container-low/80 border border-outline-variant/30 backdrop-blur-md space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">format_list_numbered</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Top 5 Mais Movimentadas</h3>
+</div>
+<span class="text-[11px] font-telemetry-mono text-on-surface-variant">Acumulado Histórico</span>
+</div>
+<!-- Stations List -->
+<div class="space-y-3.5">
+<!-- 1. Vila Olímpia -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-5 text-center font-telemetry-mono font-bold text-primary">1</span>
+<span class="font-semibold text-on-surface">Vila Olímpia</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-primary/15 text-primary border border-primary/30 font-medium">L9 Esmeralda</span>
+</div>
+<span class="font-telemetry-mono font-semibold text-on-surface">7.8M <span class="text-[10px] text-outline font-normal">pass.</span></span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<!-- 2. Osasco -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-5 text-center font-telemetry-mono font-bold text-on-surface-variant">2</span>
+<span class="font-semibold text-on-surface">Osasco</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-surface-variant text-tertiary-fixed border border-tertiary/30 font-medium">L8 &amp; L9 Conexão</span>
+</div>
+<span class="font-telemetry-mono font-semibold text-on-surface">7.7M <span class="text-[10px] text-outline font-normal">pass.</span></span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-gradient-to-r from-secondary to-primary h-full rounded-full" style="width: 98.7%"></div>
+</div>
+</div>
+<!-- 3. Amador Bueno -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-5 text-center font-telemetry-mono font-bold text-on-surface-variant">3</span>
+<span class="font-semibold text-on-surface">Amador Bueno</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-secondary/15 text-secondary border border-secondary/30 font-medium">L8 Diamante</span>
+</div>
+<span class="font-telemetry-mono font-semibold text-on-surface">7.6M <span class="text-[10px] text-outline font-normal">pass.</span></span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 97.4%"></div>
+</div>
+</div>
+<!-- 4. Santa Terezinha -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-5 text-center font-telemetry-mono font-bold text-on-surface-variant">4</span>
+<span class="font-semibold text-on-surface">Santa Terezinha</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-secondary/15 text-secondary border border-secondary/30 font-medium">L8 Diamante</span>
+</div>
+<span class="font-telemetry-mono font-semibold text-on-surface">7.6M <span class="text-[10px] text-outline font-normal">pass.</span></span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 97.2%"></div>
+</div>
+</div>
+<!-- 5. Jurubatuba -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-2">
+<span class="w-5 text-center font-telemetry-mono font-bold text-on-surface-variant">5</span>
+<span class="font-semibold text-on-surface">Jurubatuba</span>
+<span class="text-[10px] px-1.5 py-0.2 rounded bg-primary/15 text-primary border border-primary/30 font-medium">L9 Esmeralda</span>
+</div>
+<span class="font-telemetry-mono font-semibold text-on-surface">7.6M <span class="text-[10px] text-outline font-normal">pass.</span></span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 97.0%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- DEEP COMPARISON STUDIO CARD -->
+<div class="p-space-md lg:p-space-lg rounded-2xl bg-gradient-to-br from-surface-container to-surface-container-high border border-tertiary/30 relative overflow-hidden group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary/15 border border-tertiary/30 flex items-center justify-center text-tertiary shadow-sm">
+<span class="material-symbols-outlined text-[24px]">hub</span>
+</div>
+<div>
+<h4 class="text-headline-sm font-headline-sm text-on-surface">Deep Comparison Studio</h4>
+<p class="text-[12px] text-on-surface-variant mt-0.5">Cruzamento multidimensional avançado</p>
+</div>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-3 leading-relaxed">
+              Cruzar dados climáticos de precipitação Pluviométrica do CGE, calendário de megaeventos na capital e registros de manutenções preventivas.
+            </p>
+<button class="mt-4 w-full py-2.5 px-4 rounded-xl bg-surface-container-lowest hover:bg-surface-variant border border-tertiary/50 hover:border-tertiary text-tertiary font-headline-sm text-label-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm">
+<span>Abrir Deep Comparison Studio</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+<!-- FOOTER AUDIT / TELEMETRY STATUS BAR -->
+<footer class="pt-6 pb-4 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-4 text-[12px] font-telemetry-mono text-outline">
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-1.5 text-primary">
+<span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+            Telemetria em Operação Nominal
+          </span>
+<span>•</span>
+<span>Sincronização: Servidor NOC Pátio Presidente Altino</span>
+</div>
+<div>
+<span>RailPulse v4.8.2-PROD • ViaMobilidade Concessionária das Linhas 8 e 9 S.A.</span>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

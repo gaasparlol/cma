@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ViaMobilidade • Gestão de Arrecadação (Linhas 8 e 9)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      /* Cores Únicas e Oficiais das Linhas ViaMobilidade */
+      --l8-diamante: #9E9E93;
+      --l9-esmeralda: #00A88F;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #04070e;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Fundo Técnico do Mapa CCO */
+    .cco-map-canvas {
+      background-color: #050912;
+      background-image: 
+        radial-gradient(rgba(51, 65, 85, 0.32) 1px, transparent 0),
+        linear-gradient(to right, rgba(15, 23, 42, 0.45) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.45) 1px, transparent 1px);
+      background-size: 22px 22px, 110px 110px, 110px 110px;
+    }
+
+    /* Interação com as Estações no SVG */
+    .station-node {
+      cursor: pointer;
+      transition: opacity 0.25s ease;
+    }
+
+    .station-node .station-circle {
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .station-node:hover .station-circle {
+      r: 9px;
+      stroke-width: 4px;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95));
+    }
+
+    .station-node.selected-station .station-circle {
+      r: 10px;
+      stroke: #facc15 !important;
+      stroke-width: 4.5px;
+      filter: drop-shadow(0 0 14px rgba(250, 204, 21, 1));
+    }
+
+    .station-node.dimmed {
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    /* Linhas Férreas Sólidas (1 única cor por linha) */
+    .track-line {
+      transition: opacity 0.3s ease;
+    }
+
+    .track-line.dimmed {
+      opacity: 0.12;
+    }
+
+    /* Animação de pulso na estação selecionada */
+    @keyframes stationPulseRing {
+      0% {
+        r: 9px;
+        opacity: 0.95;
+      }
+      100% {
+        r: 24px;
+        opacity: 0;
+      }
+    }
+
+    .selected-pulse-ring {
+      animation: stationPulseRing 1.7s cubic-bezier(0, 0, 0.2, 1) infinite;
+      pointer-events: none;
+    }
+
+    /* Scrollbar customizado para os painéis */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-3 sm:p-4 lg:p-5 selection:bg-[#00A88F] selection:text-slate-950">
+
+  <!-- CONTAINER GERAL -->
+  <div class="max-w-[1600px] w-full mx-auto space-y-4">
+
+    <!-- =========================================================================
+         1. BARRA SUPERIOR: TÍTULO + FILTROS DE ANO, MÊS, LINHA E BUSCA
+         ========================================================================= -->
+    <header class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-2xl backdrop-blur-md">
+      <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        
+        <!-- Identidade do Painel -->
+        <div class="flex items-start sm:items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col items-center justify-center shrink-0 shadow-inner relative overflow-hidden">
+            <div class="w-full h-1/2" style="background-color: #9E9E93;"></div>
+            <div class="w-full h-1/2" style="background-color: #00A88F;"></div>
+            <span class="absolute inset-0 flex items-center justify-center font-mono-tech font-extrabold text-xs text-slate-950 bg-white/85 m-1.5 rounded-lg shadow">
+              8•9
+            </span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                ViaMobilidade • Gestão de Arrecadação
+              </span>
+              <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">
+                Painel de Giro de Catraca & Receita Tarifária • Linhas 8 e 9
+              </h1>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+              Clique em qualquer uma das <strong>41 estações</strong> no mapa para auditar o fluxo de passageiros, meios de pagamento e bloqueios por <strong>Ano</strong> e <strong>Mês</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Controles Globais de Filtro: Ano, Mês, Busca e Linha -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          
+          <!-- Filtro de ANO -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <label for="filter-year" class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#00A88F]"></i>
+              Ano:
+            </label>
+            <select id="filter-year" onchange="handlePeriodFilterChange()" class="bg-transparent text-xs sm:text-sm font-bold text-white outline-none cursor-pointer pr-1">
+              <option value="2026" class="bg-slate-900" selected>2026</option>
+              <option value="2025" class="bg-slate-900">2025</option>
+              <option value="2024" class="bg-slate-900">2024</option>
+              <option value="2023" class="bg-slate-900">2023</option>
+              <option value="2022" class="bg-slate-900">2022</option>
+            </select>
+          </div>
+
+          <!-- Filtro de MÊS -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <label for="filter-month" class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-400"></i>
+              Mês:
+            </label>
+            <select id="filter-month" onchange="handlePeriodFilterChange()" class="bg-transparent text-xs sm:text-sm font-bold text-white outline-none cursor-pointer pr-1">
+              <option value="all" class="bg-slate-900">Ano Inteiro (Acumulado)</option>
+              <option value="0" class="bg-slate-900">Janeiro</option>
+              <option value="1" class="bg-slate-900">Fevereiro</option>
+              <option value="2" class="bg-slate-900">Março</option>
+              <option value="3" class="bg-slate-900">Abril</option>
+              <option value="4" class="bg-slate-900">Maio</option>
+              <option value="5" class="bg-slate-900">Junho</option>
+              <option value="6" class="bg-slate-900">Julho</option>
+              <option value="7" class="bg-slate-900">Agosto</option>
+              <option value="8" class="bg-slate-900">Setembro</option>
+              <option value="9" class="bg-slate-900" selected>Outubro</option>
+              <option value="10" class="bg-slate-900">Novembro</option>
+              <option value="11" class="bg-slate-900">Dezembro</option>
+            </select>
+          </div>
+
+          <!-- Busca de Estação -->
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input 
+              id="station-search" 
+              type="text" 
+              oninput="handleStationSearch(this.value)"
+              placeholder="Buscar estação (ex: Pinheiros, Osasco)..." 
+              class="pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 focus:border-[#00A88F] rounded-xl text-xs text-white placeholder-slate-500 outline-none w-52 sm:w-60 transition"
+            >
+          </div>
+
+          <!-- Seletor de Linha -->
+          <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800">
+            <button onclick="setMapFilter('all')" id="filter-all" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white transition">
+              Ambas
+            </button>
+            <button onclick="setMapFilter('L8')" id="filter-L8" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: #9E9E93;"></span>
+              Linha 8
+            </button>
+            <button onclick="setMapFilter('L9')" id="filter-L9" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00A88F;"></span>
+              Linha 9
+            </button>
+            <button onclick="setMapFilter('transfer')" id="filter-transfer" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-1">
+              <i data-lucide="git-compare" class="w-3.5 h-3.5 text-amber-400"></i>
+              Baldeações
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================================
+           2. CARDS DE RESUMO DA REDE NO PERÍODO SELECIONADO (ANO / MÊS)
+           ========================================================================= -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-800/90">
+        
+        <!-- KPI 1: Total Giro de Catraca L8 + L9 -->
+        <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3.5 flex items-center justify-between">
+          <div>
+            <span id="kpi-period-label" class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+              Giro Total Rede (Outubro / 2026)
+            </span>
+            <strong id="kpi-total-network" class="text-xl sm:text-2xl font-extrabold text-white font-mono-tech mt-0.5 block">
+              29.450.120
+            </strong>
+            <span id="kpi-network-revenue" class="text-[11px] text-emerald-400 font-semibold font-mono-tech">
+              Arrecadação Bruta: R$ 118.420.500
+            </span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
+            <i data-lucide="wallet" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <!-- KPI 2: Demanda & Arrecadação Linha 8 - Diamante -->
+        <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3.5 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: #9E9E93;"></span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                Linha 8 - Diamante
+              </span>
+            </div>
+            <strong id="kpi-total-l8" class="text-xl sm:text-2xl font-extrabold text-white font-mono-tech mt-0.5 block">
+              12.840.300
+            </strong>
+            <span id="kpi-share-l8" class="text-[11px] font-medium font-mono-tech" style="color: #9E9E93;">
+              R$ 51,6 mi • 43,6% da rede
+            </span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center font-mono-tech font-extrabold text-sm text-slate-950 shrink-0" style="background-color: #9E9E93;">
+            L8
+          </div>
+        </div>
+
+        <!-- KPI 3: Demanda & Arrecadação Linha 9 - Esmeralda -->
+        <div class="bg-slate-950/90 border border-slate-800/90 rounded-xl p-3.5 flex items-center justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full" style="background-color: #00A88F;"></span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                Linha 9 - Esmeralda
+              </span>
+            </div>
+            <strong id="kpi-total-l9" class="text-xl sm:text-2xl font-extrabold text-white font-mono-tech mt-0.5 block">
+              16.609.820
+            </strong>
+            <span id="kpi-share-l9" class="text-[11px] font-medium font-mono-tech" style="color: #00A88F;">
+              R$ 66,8 mi • 56,4% da rede
+            </span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center font-mono-tech font-extrabold text-sm text-slate-950 shrink-0" style="background-color: #00A88F;">
+            L9
+          </div>
+        </div>
+
+        <!-- KPI 4: Estação Selecionada em Destaque -->
+        <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-amber-500/40 rounded-xl p-3.5 flex items-center justify-between">
+          <div class="min-w-0 pr-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+              <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i>
+              Estação em Auditoria
+            </span>
+            <strong id="kpi-selected-station-name" class="text-base sm:text-lg font-extrabold text-white truncate block mt-0.5">
+              Pinheiros
+            </strong>
+            <span id="kpi-selected-station-pax" class="text-xs font-mono-tech text-amber-300 font-bold">
+              3.298.400 giros • R$ 13,25 mi
+            </span>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         3. GRID CENTRAL: MAPA INTERATIVO (ESQUERDA) + PAINEL DA ESTAÇÃO (DIREITA)
+         ========================================================================= -->
+    <main class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+      
+      <!-- COLUNA ESQUERDA (8 COLUNAS): MAPA VETORIAL DAS LINHAS 8 E 9 -->
+      <section class="xl:col-span-8 bg-slate-900/95 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-3">
+        
+        <!-- Barra de Legenda e Ferramentas do Mapa (Zoom, Bolhas de Demanda, Velocidade dos Trens) -->
+        <div class="flex flex-wrap items-center justify-between gap-3 px-2 py-1 border-b border-slate-800/80 pb-3">
+          
+          <!-- Legenda Oficial (1 Cor Única por Linha) -->
+          <div class="flex flex-wrap items-center gap-4 text-xs">
+            <div class="flex items-center gap-2 font-bold text-slate-200">
+              <span class="w-6 h-2 rounded-full inline-block" style="background-color: #9E9E93;"></span>
+              <span>Linha 8 - Diamante <span class="text-slate-400 font-normal">(Júlio Prestes ⇄ Amador Bueno)</span></span>
+            </div>
+            <div class="flex items-center gap-2 font-bold text-slate-200">
+              <span class="w-6 h-2 rounded-full inline-block" style="background-color: #00A88F;"></span>
+              <span>Linha 9 - Esmeralda <span class="text-slate-400 font-normal">(Osasco ⇄ Varginha)</span></span>
+            </div>
+          </div>
+
+          <!-- Botões de Interação com o Mapa -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Exportar CSV Gestão de Arrecadação -->
+            <button onclick="exportArrecadacaoCSV()" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition flex items-center gap-1.5" title="Exportar planilha CSV de Giro de Catraca e Arrecadação do período filtrado">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Exportar CSV</span>
+            </button>
+
+            <!-- Alternar Bolhas Proporcionais de Passageiros no Mapa -->
+            <button onclick="toggleHeatmapBubbles()" id="btn-heatmap-bubbles" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition flex items-center gap-1.5" title="Exibir círculos proporcionais ao volume de passageiros em cada estação">
+              <i data-lucide="flame" class="w-3.5 h-3.5"></i>
+              <span>Halos de Demanda: ON</span>
+            </button>
+
+            <!-- Controles de Zoom -->
+            <div class="inline-flex items-center rounded-xl bg-slate-950 border border-slate-800 p-0.5">
+              <button onclick="zoomMap(1.2)" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Aproximar Zoom">
+                <i data-lucide="zoom-in" class="w-4 h-4"></i>
+              </button>
+              <button onclick="zoomMap(0.83)" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Afastar Zoom">
+                <i data-lucide="zoom-out" class="w-4 h-4"></i>
+              </button>
+              <button onclick="resetMapView()" class="px-2 py-1 text-[11px] font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition" title="Centralizar Mapa">
+                100%
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÁREA DO MAPA SVG INTERATIVO -->
+        <div id="map-viewport" class="cco-map-canvas border border-slate-800/90 rounded-xl relative overflow-hidden select-none cursor-grab active:cursor-grabbing" style="height: 640px;">
+          
+          <!-- Dica flutuante no canto superior esquerdo do mapa -->
+          <div class="absolute top-3 left-3 z-10 pointer-events-none flex flex-col gap-1.5">
+            <div class="bg-slate-950/90 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-2 text-[11px] text-slate-300 shadow-lg flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span><strong>Clique em qualquer estação</strong> para ver os passageiros no período filtrado • Arraste para mover</span>
+            </div>
+          </div>
+
+          <!-- Indicador do Filtro Ativo no Canto Superior Direito do Mapa -->
+          <div class="absolute top-3 right-3 z-10 pointer-events-none">
+            <div class="bg-slate-950/90 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-1.5 text-right shadow-lg">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Período em Exibição no Mapa</span>
+              <strong id="map-corner-period" class="text-xs font-mono-tech text-[#00A88F]">OUTUBRO / 2026</strong>
+            </div>
+          </div>
+
+          <!-- Legenda Compacta no Canto Inferior Esquerdo do Mapa -->
+          <div class="absolute bottom-3 left-3 z-10 pointer-events-none">
+            <div class="bg-slate-950/90 backdrop-blur-md border border-slate-800 rounded-xl px-3 py-2 shadow-lg flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
+              <span class="flex items-center gap-1.5 font-semibold">
+                <span class="w-3 h-3 rounded-full inline-block" style="background-color: #9E9E93;"></span>
+                Linha 8 - Diamante
+              </span>
+              <span class="flex items-center gap-1.5 font-semibold">
+                <span class="w-3 h-3 rounded-full inline-block" style="background-color: #00A88F;"></span>
+                Linha 9 - Esmeralda
+              </span>
+              <span class="flex items-center gap-1.5 font-semibold text-amber-300">
+                <span class="w-3 h-3 rounded-full border-2 border-amber-400 bg-slate-950 inline-block"></span>
+                Estação Selecionada
+              </span>
+            </div>
+          </div>
+
+          <!-- SVG PRINCIPAL -->
+          <svg id="viamobilidade-svg" viewBox="0 0 1120 680" class="w-full h-full">
+            <defs>
+              <!-- Brilho Sólido Linha 8 (#9E9E93) -->
+              <filter id="glow-l8" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#9E9E93" flood-opacity="0.55"/>
+              </filter>
+              <!-- Brilho Sólido Linha 9 (#00A88F - COR ÚNICA) -->
+              <filter id="glow-l9" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00A88F" flood-opacity="0.65"/>
+              </filter>
+            </defs>
+
+            <!-- Grupo Raiz com suporte a Pan & Zoom -->
+            <g id="svg-pan-zoom-group">
+              
+              <!-- Referência Hidrográfica (Rio Tietê e Rio Pinheiros) -->
+              <path d="M 30,118 Q 420,108 680,122 T 1070,96" fill="none" stroke="#0b1324" stroke-width="26" stroke-linecap="round" />
+              <text x="235" y="122" fill="#1e293b" font-size="10" font-weight="800" letter-spacing="2.5">RIO TIETÊ</text>
+
+              <path d="M 555,122 L 580,260 L 664,345 L 664,645" fill="none" stroke="#0b1324" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+              <text x="682" y="415" fill="#1e293b" font-size="10" font-weight="800" letter-spacing="2.5" transform="rotate(90 682,415)">RIO PINHEIROS (MARGINAL)</text>
+
+              <!-- Caixa Destaque do Trecho Paralelo Osasco ⇄ Presidente Altino -->
+              <rect x="470" y="136" width="94" height="56" rx="12" fill="rgba(15, 23, 42, 0.8)" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 4" />
+              <text x="517" y="128" text-anchor="middle" fill="#fbbf24" font-size="9" font-weight="800" font-family="JetBrains Mono">
+                INTEGRAÇÃO L8 ⇄ L9
+              </text>
+
+              <!-- 1. Camada de Halos de Demanda (Bolhas Proporcionais de Passageiros) -->
+              <g id="svg-heatmap-layer"></g>
+
+              <!-- 2. Camada de Trilhos das Linhas 8 (#9E9E93) e 9 (#00A88F - COR ÚNICA) -->
+              <g id="svg-tracks-layer"></g>
+
+              <!-- 3. Camada de Estações (41 Estações + Rótulos + Passageiros) -->
+              <g id="svg-stations-layer"></g>
+
+            </g>
+          </svg>
+        </div>
+
+      </section>
+
+      <!-- COLUNA DIREITA (4 COLUNAS): PAINEL GESTÃO DE ARRECADAÇÃO DA ESTAÇÃO -->
+      <aside class="xl:col-span-4 space-y-4">
+        
+        <!-- =====================================================================
+             CARD ÚNICO: AUDITORIA DE PASSAGEIROS & GESTÃO DE ARRECADAÇÃO DA ESTAÇÃO
+             ===================================================================== -->
+        <div class="bg-slate-900/95 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-4">
+          
+          <!-- Cabeçalho da Estação -->
+          <div class="flex items-start justify-between gap-3 pb-3.5 border-b border-slate-800">
+            <div>
+              <div id="st-detail-badges" class="flex items-center gap-1.5 flex-wrap mb-1.5">
+                <!-- Preenchido via JS com as cores únicas #9E9E93 ou #00A88F -->
+              </div>
+              <h2 id="st-detail-name" class="text-2xl font-extrabold text-white tracking-tight">
+                Pinheiros
+              </h2>
+              <p id="st-detail-city" class="text-xs text-slate-400 flex items-center gap-1.5 mt-1">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#00A88F]"></i>
+                <span>Município: <strong>São Paulo</strong> • Km 18,3</span>
+              </p>
+            </div>
+
+            <!-- Ranking da Estação na Linha -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-right shrink-0">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Ranking Fluxo</span>
+              <strong id="st-detail-rank" class="text-sm font-mono-tech font-extrabold text-amber-400">#1 na Linha 9</strong>
+            </div>
+          </div>
+
+          <!-- BLOCO PRINCIPAL: GIRO DE CATRACA (PASSAGEIROS) & RECEITA TARIFÁRIA -->
+          <div class="bg-slate-950 border border-slate-800/90 rounded-2xl p-4 relative overflow-hidden">
+            <div id="st-accent-bar" class="absolute top-0 left-0 bottom-0 w-1.5" style="background-color: #00A88F;"></div>
+            
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span id="st-passengers-period-title" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                Passageiros (Giro de Catraca) • Outubro / 2026
+              </span>
+              <span id="st-passengers-yoy" class="px-2 py-0.5 rounded-full text-[11px] font-mono-tech font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                +5,4% YoY
+              </span>
+            </div>
+
+            <div class="flex items-baseline gap-2.5 my-1">
+              <strong id="st-passengers-total" class="text-3xl sm:text-4xl font-extrabold text-white font-mono-tech tracking-tight">
+                3.298.400
+              </strong>
+              <span class="text-xs font-semibold text-slate-400">passageiros</span>
+            </div>
+
+            <!-- Receita Tarifária Bruta da Estação -->
+            <div class="mt-2.5 pt-2.5 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-xs text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="banknote" class="w-4 h-4 text-emerald-400"></i>
+                Receita Tarifária Estimada:
+              </span>
+              <strong id="st-revenue-total" class="text-sm sm:text-base font-mono-tech font-extrabold text-emerald-400">
+                R$ 13.259.568
+              </strong>
+            </div>
+
+            <p id="st-passengers-share" class="text-[11px] text-slate-400 mt-1.5">
+              Representa <strong class="text-slate-200">19,8%</strong> de todo o fluxo da Linha 9 - Esmeralda no período.
+            </p>
+
+            <!-- Sub-métricas de Fluxo da Estação -->
+            <div class="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-slate-800/90 text-center">
+              <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800/70">
+                <span class="text-[10px] text-slate-400 uppercase block">Média Dia Útil</span>
+                <strong id="st-daily-avg" class="text-xs sm:text-sm font-mono-tech font-bold text-white mt-0.5 block">
+                  128.400
+                </strong>
+              </div>
+              <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800/70">
+                <span class="text-[10px] text-slate-400 uppercase block">Média Fim Sem.</span>
+                <strong id="st-paying-pax" class="text-xs sm:text-sm font-mono-tech font-bold text-slate-200 mt-0.5 block">
+                  55.210
+                </strong>
+              </div>
+              <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800/70">
+                <span class="text-[10px] text-slate-400 uppercase block">Hora Pico</span>
+                <strong id="st-peak-hour" class="text-xs sm:text-sm font-mono-tech font-bold text-amber-300 mt-0.5 block">
+                  19.260/h
+                </strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- BREAKDOWN POR CANAL DE ARRECADAÇÃO (ZERADO QUANDO NÃO HÁ DADOS NAS LINHAS 8 E 9) -->
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="credit-card" class="w-3.5 h-3.5 text-[#00A88F]"></i>
+                <span>Meios de Pagamento na Catraca</span>
+              </h3>
+              <span id="st-payment-status-badge" class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
+                • Sem dados
+              </span>
+            </div>
+
+            <div id="st-payment-channels" class="space-y-2.5 text-xs">
+              <!-- Preenchido via JS (Zerado 0 / 0,0% por padrão enquanto não houver dados) -->
+            </div>
+          </div>
+
+          <!-- INFRAESTRUTURA DE BLOQUEIOS E ATMs DA ESTAÇÃO (ZERADO QUANDO NÃO HÁ DADOS) -->
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-3.5">
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-amber-400"></i>
+                Parque de Arrecadação da Estação
+              </span>
+              <span id="st-equipment-status-badge" class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
+                • Sem dados
+              </span>
+            </div>
+            <div id="st-equipment-grid" class="grid grid-cols-3 gap-2 text-center">
+              <!-- Preenchido via JS (Zerado 0/0, 0 unid., 0 term. por padrão enquanto não houver dados) -->
+            </div>
+          </div>
+
+          <!-- GRÁFICO INTERATIVO DE EVOLUÇÃO MENSAL DA ESTAÇÃO NO ANO SELECIONADO -->
+          <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                  <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-[#00A88F]"></i>
+                  <span id="chart-station-title">Sazonalidade Mensal</span>
+                </h3>
+                <p class="text-[11px] text-slate-400">Clique em uma barra para auditar o mês</p>
+              </div>
+              <span id="chart-year-badge" class="text-xs font-mono-tech font-bold px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">
+                2026
+              </span>
+            </div>
+
+            <!-- Barras dos 12 Meses -->
+            <div id="monthly-chart-bars" class="grid grid-cols-12 gap-1.5 items-end h-28 pt-4 px-1">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </main>
+
+    <!-- =========================================================================
+         4. SEÇÃO INFERIOR: TOP 10 ESTAÇÕES MAIS MOVIMENTADAS NO PERÍODO FILTRADO
+         ========================================================================= -->
+    <section class="bg-slate-900/95 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+          <h3 class="text-sm font-extrabold uppercase tracking-wider text-white">
+            Ranking das 10 Estações com Maior Fluxo de Passageiros no Período
+          </h3>
+        </div>
+        <span id="ranking-period-subtitle" class="text-xs font-mono-tech text-slate-400">
+          Clique em qualquer card abaixo para focar a estação no mapa
+        </span>
+      </div>
+
+      <div id="top-stations-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+        <!-- Renderizado dinamicamente via JS de acordo com Ano, Mês e Linha -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===========================================================================
+       SCRIPTS: MOTOR DE DADOS DE PASSAGEIROS (ANO/MÊS) + MAPA VETORIAL INTERATIVO
+       =========================================================================== -->
+  <script>
+    // Cores Oficiais Únicas e Sólidas
+    const COLOR_L8_DIAMANTE = '#9E9E93';
+    const COLOR_L9_ESMERALDA = '#00A88F';
+
+    const monthNamesFull = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    const monthNamesShort = [
+      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
+    ];
+
+    // Multiplicadores Históricos Anuais (Crescimento da malha e inauguração de Mendes-Vila Natal e Varginha)
+    const yearMultipliers = {
+      '2022': 0.84,
+      '2023': 0.90,
+      '2024': 0.95,
+      '2025': 0.98,
+      '2026': 1.03
+    };
+
+    // Sazonalidade Mensal Típica do Transporte Metroferroviário de SP (Férias em Jan/Jul, Pico em Mar/Ago/Out)
+    const monthSeasonality = [
+      0.86, // Jan (Férias escolares)
+      0.92, // Fev (Carnaval / Retorno)
+      1.05, // Mar (Pleno período letivo/corporativo)
+      1.01, // Abr
+      1.04, // Mai
+      0.99, // Jun
+      0.91, // Jul (Férias de inverno)
+      1.06, // Ago (Pico 2º semestre)
+      1.03, // Set
+      1.07, // Out (Pico de eventos / comércio)
+      1.02, // Nov
+      0.94  // Dez (Festas de fim de ano)
+    ];
+
+    // =========================================================================
+    // 1. CATÁLOGO DAS 41 ESTAÇÕES COM MÉDIA DIÁRIA ÚTIL BASE (REALISTA)
+    // =========================================================================
+    const stationsCatalog = {
+      // --- LINHA 8 - DIAMANTE (Amador Bueno ⇄ Júlio Prestes) ---
+      'amador-bueno': {
+        id: 'amador-bueno', name: 'Amador Bueno', lines: ['L8'], city: 'Itapevi', km: 'Km 42,4',
+        transfers: ['Extensão Operacional Linha 8'], baseDailyWeekday: 6800,
+        x: 42, y: 78, labelPos: 'top', seed: 11
+      },
+      'santa-rita': {
+        id: 'santa-rita', name: 'Santa Rita', lines: ['L8'], city: 'Itapevi', km: 'Km 39,8',
+        transfers: ['Extensão Operacional Linha 8'], baseDailyWeekday: 8100,
+        x: 82, y: 78, labelPos: 'bottom', seed: 17
+      },
+      'itapevi': {
+        id: 'itapevi', name: 'Itapevi', lines: ['L8'], city: 'Itapevi', km: 'Km 36,1',
+        transfers: ['Terminal Rodoviário Itapevi', 'Conexão Extensão Amador Bueno'], baseDailyWeekday: 42500,
+        x: 122, y: 78, labelPos: 'top', isTransfer: true, seed: 23
+      },
+      'eng-cardoso': {
+        id: 'eng-cardoso', name: 'Engenheiro Cardoso', lines: ['L8'], city: 'Itapevi', km: 'Km 34,2',
+        transfers: [], baseDailyWeekday: 16900,
+        x: 158, y: 78, labelPos: 'bottom', seed: 29
+      },
+      'sagrado-coracao': {
+        id: 'sagrado-coracao', name: 'Sagrado Coração', lines: ['L8'], city: 'Jandira', km: 'Km 31,9',
+        transfers: [], baseDailyWeekday: 11800,
+        x: 192, y: 92, labelPos: 'top', seed: 31
+      },
+      'jandira': {
+        id: 'jandira', name: 'Jandira', lines: ['L8'], city: 'Jandira', km: 'Km 29,7',
+        transfers: ['Terminal Municipal de Jandira'], baseDailyWeekday: 29400,
+        x: 224, y: 112, labelPos: 'bottom', seed: 37
+      },
+      'jardim-silveira': {
+        id: 'jardim-silveira', name: 'Jardim Silveira', lines: ['L8'], city: 'Barueri', km: 'Km 27,8',
+        transfers: ['Terminal Jardim Silveira'], baseDailyWeekday: 18600,
+        x: 254, y: 132, labelPos: 'top', seed: 41
+      },
+      'jardim-belval': {
+        id: 'jardim-belval', name: 'Jardim Belval', lines: ['L8'], city: 'Barueri', km: 'Km 26,1',
+        transfers: [], baseDailyWeekday: 13900,
+        x: 282, y: 150, labelPos: 'bottom', seed: 43
+      },
+      'barueri': {
+        id: 'barueri', name: 'Barueri', lines: ['L8'], city: 'Barueri', km: 'Km 24,0',
+        transfers: ['Terminal Rodoferroviário Gualberto Tolaine'], baseDailyWeekday: 44800,
+        x: 312, y: 164, labelPos: 'top', seed: 47
+      },
+      'antonio-joao': {
+        id: 'antonio-joao', name: 'Antonio João', lines: ['L8'], city: 'Barueri', km: 'Km 21,9',
+        transfers: ['Acesso Parque Shopping Barueri / Alphaville'], baseDailyWeekday: 28200,
+        x: 340, y: 164, labelPos: 'bottom', seed: 53
+      },
+      'santa-terezinha': {
+        id: 'santa-terezinha', name: 'Santa Terezinha', lines: ['L8'], city: 'Carapicuíba', km: 'Km 20,6',
+        transfers: [], baseDailyWeekday: 9600,
+        x: 367, y: 164, labelPos: 'top', seed: 59
+      },
+      'carapicuiba': {
+        id: 'carapicuiba', name: 'Carapicuíba', lines: ['L8'], city: 'Carapicuíba', km: 'Km 19,2',
+        transfers: ['Terminal Metropolitano Carapicuíba (EMTU)'], baseDailyWeekday: 51400,
+        x: 394, y: 164, labelPos: 'bottom', seed: 61
+      },
+      'gen-miguel-costa': {
+        id: 'gen-miguel-costa', name: 'Gen. Miguel Costa', lines: ['L8'], city: 'Carapicuíba', km: 'Km 17,5',
+        transfers: ['Terminal Urbano Km 21'], baseDailyWeekday: 25900,
+        x: 420, y: 164, labelPos: 'top', seed: 67
+      },
+      'quitauna': {
+        id: 'quitauna', name: 'Quitaúna', lines: ['L8'], city: 'Osasco', km: 'Km 16,2',
+        transfers: [], baseDailyWeekday: 15100,
+        x: 444, y: 164, labelPos: 'bottom', seed: 71
+      },
+      'cmdte-sampaio': {
+        id: 'cmdte-sampaio', name: 'Comandante Sampaio', lines: ['L8'], city: 'Osasco', km: 'Km 14,9',
+        transfers: [], baseDailyWeekday: 21800,
+        x: 468, y: 164, labelPos: 'top', seed: 73
+      },
+
+      // --- ESTAÇÕES DE INTEGRAÇÃO COMPARTILHADAS (LINHA 8 E LINHA 9) ---
+      'osasco': {
+        id: 'osasco', name: 'Osasco', lines: ['L8', 'L9'], city: 'Osasco', km: 'Km 13,3',
+        transfers: ['Integração Livre Linha 8 - Diamante ⇄ Linha 9 - Esmeralda', 'Terminal Largo de Osasco'],
+        baseDailyWeekday: 79400, x: 495, y: 164, labelPos: 'bottom', isTransfer: true, seed: 79
+      },
+      'pres-altino': {
+        id: 'pres-altino', name: 'Presidente Altino', lines: ['L8', 'L9'], city: 'Osasco', km: 'Km 11,6',
+        transfers: ['Integração Livre Linha 8 - Diamante ⇄ Linha 9 - Esmeralda', 'Pátio Central ViaMobilidade'],
+        baseDailyWeekday: 54200, x: 540, y: 164, labelPos: 'top', isTransfer: true, seed: 83
+      },
+
+      // --- CONTINUAÇÃO LESTE LINHA 8 - DIAMANTE ---
+      'imp-leopoldina': {
+        id: 'imp-leopoldina', name: 'Imperatriz Leopoldina', lines: ['L8'], city: 'São Paulo', km: 'Km 9,7',
+        transfers: ['Acesso Vila Leopoldina'], baseDailyWeekday: 30600,
+        x: 615, y: 132, labelPos: 'top', seed: 89
+      },
+      'domingos-moraes': {
+        id: 'domingos-moraes', name: 'Domingos de Moraes', lines: ['L8'], city: 'São Paulo', km: 'Km 7,4',
+        transfers: [], baseDailyWeekday: 32800,
+        x: 690, y: 112, labelPos: 'bottom', seed: 97
+      },
+      'lapa': {
+        id: 'lapa', name: 'Lapa', lines: ['L8'], city: 'São Paulo', km: 'Km 6,2',
+        transfers: ['Terminal Lapa SPTrans'], baseDailyWeekday: 46200,
+        x: 770, y: 98, labelPos: 'top', seed: 101
+      },
+      'barra-funda': {
+        id: 'barra-funda', name: 'Palmeiras-Barra Funda', lines: ['L8'], city: 'São Paulo', km: 'Km 3,1',
+        transfers: ['Linha 3 - Vermelha (Metrô)', 'Linha 7 - Rubi (TIC Trens)', 'Expresso Aeroporto (L13)', 'Rodoviária Barra Funda'],
+        baseDailyWeekday: 146500, x: 865, y: 98, labelPos: 'top', isTransfer: true, seed: 103
+      },
+      'julio-prestes': {
+        id: 'julio-prestes', name: 'Júlio Prestes', lines: ['L8'], city: 'São Paulo', km: 'Km 0,0',
+        transfers: ['Sala São Paulo', 'Conexão Estação da Luz'], baseDailyWeekday: 27900,
+        x: 965, y: 98, labelPos: 'top', isTransfer: true, seed: 107
+      },
+
+      // --- LINHA 9 - ESMERALDA (Osasco ⇄ Varginha - Cor Única #00A88F) ---
+      'ceasa': {
+        id: 'ceasa', name: 'Ceasa', lines: ['L9'], city: 'São Paulo', km: 'Km 13,1',
+        transfers: ['CEAGESP Entreposto Central'], baseDailyWeekday: 17400,
+        x: 562, y: 205, labelPos: 'left', seed: 109
+      },
+      'villa-lobos': {
+        id: 'villa-lobos', name: 'Villa-Lobos-Jaguaré', lines: ['L9'], city: 'São Paulo', km: 'Km 14,5',
+        transfers: ['Parque Estadual Villa-Lobos'], baseDailyWeekday: 31200,
+        x: 576, y: 242, labelPos: 'left', seed: 113
+      },
+      'cid-universitaria': {
+        id: 'cid-universitaria', name: 'Cidade Universitária', lines: ['L9'], city: 'São Paulo', km: 'Km 16,8',
+        transfers: ['USP - Cidade Universitária / Butantã'], baseDailyWeekday: 26400,
+        x: 598, y: 274, labelPos: 'left', seed: 127
+      },
+      'pinheiros': {
+        id: 'pinheiros', name: 'Pinheiros', lines: ['L9'], city: 'São Paulo', km: 'Km 18,3',
+        transfers: ['Linha 4 - Amarela (ViaQuatro)', 'Terminal Pinheiros SPTrans'],
+        baseDailyWeekday: 139800, x: 632, y: 304, labelPos: 'right', isTransfer: true, seed: 131
+      },
+      'hebraica-reboucas': {
+        id: 'hebraica-reboucas', name: 'Hebraica-Rebouças', lines: ['L9'], city: 'São Paulo', km: 'Km 19,7',
+        transfers: ['Shopping Eldorado / Faria Lima'], baseDailyWeekday: 34200,
+        x: 654, y: 332, labelPos: 'right', seed: 137
+      },
+      'cidade-jardim': {
+        id: 'cidade-jardim', name: 'Cidade Jardim', lines: ['L9'], city: 'São Paulo', km: 'Km 21,2',
+        transfers: ['Parque do Povo / Itaim Bibi'], baseDailyWeekday: 28900,
+        x: 654, y: 360, labelPos: 'right', seed: 139
+      },
+      'vila-olimpia': {
+        id: 'vila-olimpia', name: 'Vila Olímpia', lines: ['L9'], city: 'São Paulo', km: 'Km 22,4',
+        transfers: ['Eixo Empresarial Vila Olímpia / JK'], baseDailyWeekday: 67800,
+        x: 654, y: 388, labelPos: 'right', seed: 149
+      },
+      'berrini': {
+        id: 'berrini', name: 'Berrini', lines: ['L9'], city: 'São Paulo', km: 'Km 23,8',
+        transfers: ['Corredor Eng. Luís Carlos Berrini'], baseDailyWeekday: 54600,
+        x: 654, y: 416, labelPos: 'right', seed: 151
+      },
+      'morumbi': {
+        id: 'morumbi', name: 'Morumbi', lines: ['L9'], city: 'São Paulo', km: 'Km 25,2',
+        transfers: ['Futura Linha 17 - Ouro (Monotrilho)', 'MorumbiShopping / Rochaverá'],
+        baseDailyWeekday: 59400, x: 654, y: 444, labelPos: 'right', isTransfer: true, seed: 157
+      },
+      'granja-julieta': {
+        id: 'granja-julieta', name: 'Granja Julieta', lines: ['L9'], city: 'São Paulo', km: 'Km 26,6',
+        transfers: ['Polo Empresarial Chácara Santo Antônio'], baseDailyWeekday: 29800,
+        x: 654, y: 472, labelPos: 'right', seed: 163
+      },
+      'joao-dias': {
+        id: 'joao-dias', name: 'João Dias', lines: ['L9'], city: 'São Paulo', km: 'Km 27,9',
+        transfers: ['Acesso Ponte João Dias'], baseDailyWeekday: 22900,
+        x: 654, y: 500, labelPos: 'right', seed: 167
+      },
+      'santo-amaro': {
+        id: 'santo-amaro', name: 'Santo Amaro', lines: ['L9'], city: 'São Paulo', km: 'Km 29,4',
+        transfers: ['Linha 5 - Lilás (ViaMobilidade)', 'Terminal Guido Caloi SPTrans'],
+        baseDailyWeekday: 132600, x: 654, y: 528, labelPos: 'right', isTransfer: true, seed: 173
+      },
+      'socorro': {
+        id: 'socorro', name: 'Socorro', lines: ['L9'], city: 'São Paulo', km: 'Km 31,0',
+        transfers: ['Largo do Socorro'], baseDailyWeekday: 23500,
+        x: 668, y: 556, labelPos: 'left', seed: 179
+      },
+      'jurubatuba': {
+        id: 'jurubatuba', name: 'Jurubatuba', lines: ['L9'], city: 'São Paulo', km: 'Km 32,8',
+        transfers: ['Shopping SP Market'], baseDailyWeekday: 36400,
+        x: 695, y: 580, labelPos: 'left', seed: 181
+      },
+      'autodromo': {
+        id: 'autodromo', name: 'Autódromo', lines: ['L9'], city: 'São Paulo', km: 'Km 35,6',
+        transfers: ['Autódromo de Interlagos (F1 / Lollapalooza / The Town)'], baseDailyWeekday: 27800,
+        x: 735, y: 602, labelPos: 'bottom', seed: 191
+      },
+      'primavera-interlagos': {
+        id: 'primavera-interlagos', name: 'Primavera-Interlagos', lines: ['L9'], city: 'São Paulo', km: 'Km 37,5',
+        transfers: [], baseDailyWeekday: 39400,
+        x: 785, y: 618, labelPos: 'top', seed: 193
+      },
+      'grajau': {
+        id: 'grajau', name: 'Grajaú', lines: ['L9'], city: 'São Paulo', km: 'Km 39,4',
+        transfers: ['Terminal Grajaú SPTrans'], baseDailyWeekday: 76800,
+        x: 840, y: 628, labelPos: 'bottom', isTransfer: true, seed: 197
+      },
+      'mendes-vila-natal': {
+        id: 'mendes-vila-natal', name: 'Bruno Covas / Mendes-Vila Natal', lines: ['L9'], city: 'São Paulo', km: 'Km 41,8',
+        transfers: ['Terminal Urbano Vila Natal'], baseDailyWeekday: 38200,
+        x: 910, y: 628, labelPos: 'top', seed: 199
+      },
+      'varginha': {
+        id: 'varginha', name: 'Varginha', lines: ['L9'], city: 'São Paulo', km: 'Km 44,2',
+        transfers: ['Terminal Varginha (Extremo Sul)'], baseDailyWeekday: 43500,
+        x: 985, y: 628, labelPos: 'bottom', isTransfer: true, seed: 211
+      }
+    };
+
+    // Sequência Ordenada das Estações nas Linhas 8 e 9
+    const line8Sequence = [
+      'amador-bueno', 'santa-rita', 'itapevi', 'eng-cardoso', 'sagrado-coracao',
+      'jandira', 'jardim-silveira', 'jardim-belval', 'barueri', 'antonio-joao',
+      'santa-terezinha', 'carapicuiba', 'gen-miguel-costa', 'quitauna', 'cmdte-sampaio',
+      'osasco', 'pres-altino', 'imp-leopoldina', 'domingos-moraes', 'lapa',
+      'barra-funda', 'julio-prestes'
+    ];
+
+    const line9Sequence = [
+      'osasco', 'pres-altino', 'ceasa', 'villa-lobos', 'cid-universitaria',
+      'pinheiros', 'hebraica-reboucas', 'cidade-jardim', 'vila-olimpia', 'berrini',
+      'morumbi', 'granja-julieta', 'joao-dias', 'santo-amaro', 'socorro',
+      'jurubatuba', 'autodromo', 'primavera-interlagos', 'grajau', 'mendes-vila-natal',
+      'varginha'
+    ];
+
+    // Estado da Aplicação
+    let currentSelectedStationId = 'pinheiros';
+    let currentMapFilter = 'all';
+    let showHeatmapBubbles = true;
+
+    // Estado de Pan & Zoom do SVG
+    let mapZoom = 1;
+    let mapPanX = 0;
+    let mapPanY = 0;
+    let isDraggingMap = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+
+    // =========================================================================
+    // BASE COMPLEMENTAR DE MEIOS DE PAGAMENTO E BLOQUEIOS POR ESTAÇÃO
+    // Como as Linhas 8 e 9 ainda não possuem esses dados integrados, o objeto
+    // fica vazio/null por padrão e a interface exibe todos os campos ZERADOS (0 / 0,0%).
+    // Quando a área de Gestão de Arrecadação receber esses dados, basta preencher aqui.
+    // =========================================================================
+    const stationExtraArrecadacaoData = {
+      // Exemplo futuro quando houver dados:
+      // 'pinheiros': {
+      //   channels: { topBU: 120000, qrCode: 35000, nfc: 12000, free: 28000 },
+      //   equipment: { activeGates: 28, totalGates: 28, nfcGates: 13, atms: 10 }
+      // }
+    };
+
+    // =========================================================================
+    // 2. MOTOR DE CÁLCULO DE PASSAGEIROS POR ESTAÇÃO, ANO E MÊS
+    // =========================================================================
+    function formatNumberBR(num) {
+      return Math.round(num).toLocaleString('pt-BR');
+    }
+
+    function formatCompactBR(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' mi';
+      }
+      if (num >= 1000) {
+        return Math.round(num / 1000).toLocaleString('pt-BR') + ' mil';
+      }
+      return formatNumberBR(num);
+    }
+
+    // Calcula o fluxo de passageiros de uma estação para um mês específico (0-11) e ano (2022-2026)
+    function computeStationMonthPassengers(stationId, yearStr, monthIndex) {
+      const st = stationsCatalog[stationId];
+      if (!st) return { total: 0, dailyWeekday: 0, weekendAvg: 0, peakHour: 0, yoyPercent: 0 };
+
+      let yearFactor = yearMultipliers[yearStr] || 1.0;
+
+      // Varginha teve ramp-up menor antes de 2025
+      if (stationId === 'varginha' && parseInt(yearStr) < 2025) {
+        yearFactor *= 0.38;
+      }
+
+      const seasonFactor = monthSeasonality[monthIndex] || 1.0;
+
+      // Oscilação determinística sutil por estação/mês/ano para realismo estatístico
+      const wave = 1 + Math.sin((st.seed * 0.7) + (monthIndex * 0.85) + parseInt(yearStr)) * 0.032;
+
+      // Em Autódromo, meses de grandes festivais/F1 (Março, Setembro, Novembro) têm pico adicional
+      let eventBoost = 1.0;
+      if (stationId === 'autodromo' && (monthIndex === 2 || monthIndex === 8 || monthIndex === 10)) {
+        eventBoost = 1.28;
+      }
+
+      const dailyWeekday = Math.round(st.baseDailyWeekday * yearFactor * seasonFactor * wave * eventBoost);
+      const weekendAvg = Math.round(dailyWeekday * 0.43);
+
+      // Equivalente mensal (22 dias úteis + 8 dias de fim de semana = ~25,44 dias úteis equivalentes)
+      const monthlyTotal = (dailyWeekday * 22) + (weekendAvg * 8);
+      const peakHour = Math.round(dailyWeekday * 0.148);
+
+      // Percentual de passageiros pagantes vs gratuidades/integrações livres (determinístico por estação)
+      const payingShare = 0.78 + ((st.seed % 9) * 0.008); // entre 78% e 85,2%
+      const payingPassengers = Math.round(monthlyTotal * payingShare);
+
+      // Tarifa média efetiva de arrecadação por giro pagante (R$ 5,00 nominal ponderado por integrações)
+      const avgEffectiveFare = 4.92;
+      const grossRevenue = Math.round(payingPassengers * avgEffectiveFare);
+
+      // Divisão por canal de arrecadação na estação
+      const shareCardTopBU = 0.64 - ((st.seed % 5) * 0.012); // Cartão TOP / Bilhete Único (~60-64%)
+      const shareQRCode = 0.14 + ((st.seed % 4) * 0.008);    // Bilhete Digital QR Code (~14-17%)
+      const shareNFC = Math.max(0.03, payingShare - shareCardTopBU - shareQRCode); // Cartão Débito/Crédito NFC na catraca
+      const shareFree = Math.max(0.12, 1 - payingShare);     // Gratuidade / Idoso / Estudante / Transferência
+
+      // Variação YoY comparada ao ano anterior
+      const prevYearFactor = (yearMultipliers[String(parseInt(yearStr) - 1)] || (yearFactor * 0.95));
+      const yoyPercent = (((yearFactor * wave) / prevYearFactor) - 1) * 100;
+
+      return {
+        total: monthlyTotal,
+        payingPassengers,
+        payingShare,
+        grossRevenue,
+        channels: {
+          topBU: shareCardTopBU,
+          qrCode: shareQRCode,
+          nfc: shareNFC,
+          free: shareFree
+        },
+        dailyWeekday,
+        weekendAvg,
+        peakHour,
+        yoyPercent: Math.max(-4.5, Math.min(18.4, yoyPercent))
+      };
+    }
+
+    // Calcula o fluxo e arrecadação da estação considerando se o usuário escolheu um Mês específico ou "Ano Inteiro (all)"
+    function getStationAnalytics(stationId, yearStr, monthVal) {
+      if (monthVal === 'all') {
+        let sumTotal = 0;
+        let sumPaying = 0;
+        let sumRevenue = 0;
+        let sumWeekday = 0;
+        let sumWeekend = 0;
+        let sumPeak = 0;
+        let sumYoY = 0;
+        let lastMonthRef = null;
+
+        for (let m = 0; m < 12; m++) {
+          const mData = computeStationMonthPassengers(stationId, yearStr, m);
+          sumTotal += mData.total;
+          sumPaying += mData.payingPassengers;
+          sumRevenue += mData.grossRevenue;
+          sumWeekday += mData.dailyWeekday;
+          sumWeekend += mData.weekendAvg;
+          sumPeak += mData.peakHour;
+          sumYoY += mData.yoyPercent;
+          lastMonthRef = mData;
+        }
+
+        return {
+          total: sumTotal,
+          payingPassengers: sumPaying,
+          payingShare: lastMonthRef ? lastMonthRef.payingShare : 0.81,
+          grossRevenue: sumRevenue,
+          channels: lastMonthRef ? lastMonthRef.channels : { topBU: 0.62, qrCode: 0.15, nfc: 0.05, free: 0.18 },
+          dailyWeekday: Math.round(sumWeekday / 12),
+          weekendAvg: Math.round(sumWeekend / 12),
+          peakHour: Math.round(sumPeak / 12),
+          yoyPercent: sumYoY / 12
+        };
+      } else {
+        return computeStationMonthPassengers(stationId, yearStr, parseInt(monthVal));
+      }
+    }
+
+    function getSelectedPeriodLabel() {
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+      if (monthVal === 'all') {
+        return `Acumulado Anual / ${yearStr}`;
+      }
+      return `${monthNamesFull[parseInt(monthVal)]} / ${yearStr}`;
+    }
+
+    // =========================================================================
+    // 3. RENDERIZAÇÃO DO MAPA VETORIAL (LINHA 9 COM COR ÚNICA #00A88F)
+    // =========================================================================
+    function buildPolylinePoints(sequence, yOffset = 0) {
+      return sequence.map(stId => {
+        const s = stationsCatalog[stId];
+        // No trecho paralelo entre Osasco e Presidente Altino, separa visualmente o trilho L8 (-4px) e L9 (+4px)
+        const offset = (stId === 'osasco' || stId === 'pres-altino') ? yOffset : 0;
+        return `${s.x},${s.y + offset}`;
+      }).join(' ');
+    }
+
+    function renderInteractiveMap() {
+      const tracksLayer = document.getElementById('svg-tracks-layer');
+      const stationsLayer = document.getElementById('svg-stations-layer');
+
+      const l8Points = buildPolylinePoints(line8Sequence, -4);
+      const l9Points = buildPolylinePoints(line9Sequence, 4);
+
+      // IMPORTANTE: Cada linha possui APENAS UMA COR SÓLIDA OFICIAL (#9E9E93 para L8 e #00A88F para L9)
+      tracksLayer.innerHTML = `
+        <!-- Linha 8 - Diamante: Cor Única #9E9E93 -->
+        <polyline id="svg-line-L8" class="track-line" points="${l8Points}" 
+          fill="none" stroke="${COLOR_L8_DIAMANTE}" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-l8)" />
+
+        <!-- Linha 9 - Esmeralda: Cor Única #00A88F -->
+        <polyline id="svg-line-L9" class="track-line" points="${l9Points}" 
+          fill="none" stroke="${COLOR_L9_ESMERALDA}" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-l9)" />
+      `;
+
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+
+      let stationsHtml = '';
+      Object.values(stationsCatalog).forEach(st => {
+        const isDual = st.lines.length === 2;
+        // Estações da Linha 9 usam exclusivamente #00A88F; Linha 8 usa #9E9E93
+        const strokeColor = st.lines[0] === 'L8' ? COLOR_L8_DIAMANTE : COLOR_L9_ESMERALDA;
+        const radius = st.isTransfer ? 7 : 5.5;
+
+        // Cálculo da posição do nome da estação e selo de passageiros
+        let textX = st.x;
+        let textY = st.y - 13;
+        let anchor = 'middle';
+        let rotation = '';
+
+        if (st.labelPos === 'top') {
+          textY = st.y - 13;
+          if (st.x < 480 && st.lines.includes('L8')) {
+            rotation = `transform="rotate(-34 ${st.x} ${st.y - 11})"`;
+            anchor = 'start';
+          }
+        } else if (st.labelPos === 'bottom') {
+          textY = st.y + 21;
+          if (st.x < 480 && st.lines.includes('L8')) {
+            rotation = `transform="rotate(34 ${st.x} ${st.y + 15})"`;
+            anchor = 'start';
+          }
+        } else if (st.labelPos === 'right') {
+          textX = st.x + 15;
+          textY = st.y + 3.5;
+          anchor = 'start';
+        } else if (st.labelPos === 'left') {
+          textX = st.x - 15;
+          textY = st.y + 3.5;
+          anchor = 'end';
+        }
+
+        const isSelected = st.id === currentSelectedStationId;
+        const selectedClass = isSelected ? 'selected-station' : '';
+        const stats = getStationAnalytics(st.id, yearStr, monthVal);
+
+        stationsHtml += `
+          <g class="station-node ${selectedClass}" id="st-node-${st.id}" data-lines="${st.lines.join(',')}" data-transfer="${!!st.isTransfer}" onclick="selectStationOnMap('${st.id}')">
+            ${isSelected ? `<circle cx="${st.x}" cy="${st.y}" r="14" fill="none" stroke="#facc15" stroke-width="2.5" class="selected-pulse-ring" />` : ''}
+            ${isDual ? `
+              <!-- Cápsula Bicolor para Osasco e Presidente Altino (#9E9E93 em cima e #00A88F embaixo) -->
+              <circle cx="${st.x}" cy="${st.y - 4}" r="5.5" fill="#050912" stroke="${COLOR_L8_DIAMANTE}" stroke-width="3" class="station-circle" />
+              <circle cx="${st.x}" cy="${st.y + 4}" r="5.5" fill="#050912" stroke="${COLOR_L9_ESMERALDA}" stroke-width="3" class="station-circle" />
+            ` : `
+              <circle cx="${st.x}" cy="${st.y}" r="${radius}" fill="#050912" stroke="${strokeColor}" stroke-width="${st.isTransfer ? 3.4 : 2.6}" class="station-circle" />
+            `}
+            <text x="${textX}" y="${textY}" text-anchor="${anchor}" ${rotation}
+              fill="${isSelected ? '#fde047' : (st.isTransfer ? '#ffffff' : '#cbd5e1')}" 
+              font-size="${st.isTransfer ? '10.5' : '9.5'}" 
+              font-weight="${isSelected || st.isTransfer ? '800' : '600'}">
+              ${st.name}
+            </text>
+            <title>${st.name} (${st.lines.join('/')}) • ${formatNumberBR(stats.total)} passageiros no período</title>
+          </g>
+        `;
+      });
+
+      stationsLayer.innerHTML = stationsHtml;
+      renderHeatmapBubbles();
+      applyCurrentFilterClasses();
+    }
+
+    // Desenha os halos proporcionais à quantidade de passageiros de cada estação no mapa
+    function renderHeatmapBubbles() {
+      const heatmapLayer = document.getElementById('svg-heatmap-layer');
+      if (!heatmapLayer) return;
+
+      if (!showHeatmapBubbles) {
+        heatmapLayer.innerHTML = '';
+        return;
+      }
+
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+
+      // Descobre o maior volume para normalizar os raios das bolhas
+      let maxTotal = 1;
+      Object.keys(stationsCatalog).forEach(stId => {
+        const val = getStationAnalytics(stId, yearStr, monthVal).total;
+        if (val > maxTotal) maxTotal = val;
+      });
+
+      let bubblesHtml = '';
+      Object.values(stationsCatalog).forEach(st => {
+        if (currentMapFilter === 'L8' && !st.lines.includes('L8')) return;
+        if (currentMapFilter === 'L9' && !st.lines.includes('L9')) return;
+        if (currentMapFilter === 'transfer' && !st.isTransfer) return;
+
+        const val = getStationAnalytics(st.id, yearStr, monthVal).total;
+        const ratio = Math.sqrt(val / maxTotal);
+        const radius = 8 + ratio * 22;
+
+        // Usa estritamente a cor da linha (#9E9E93 para L8 ou #00A88F para L9)
+        const bubbleColor = st.lines.includes('L9') ? COLOR_L9_ESMERALDA : COLOR_L8_DIAMANTE;
+
+        bubblesHtml += `
+          <circle cx="${st.x}" cy="${st.y}" r="${radius.toFixed(1)}" 
+            fill="${bubbleColor}" fill-opacity="0.16" 
+            stroke="${bubbleColor}" stroke-opacity="0.38" stroke-width="1"
+            pointer-events="none" />
+        `;
+      });
+
+      heatmapLayer.innerHTML = bubblesHtml;
+    }
+
+    function toggleHeatmapBubbles() {
+      showHeatmapBubbles = !showHeatmapBubbles;
+      const btn = document.getElementById('btn-heatmap-bubbles');
+      if (showHeatmapBubbles) {
+        btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 transition flex items-center gap-1.5';
+        btn.innerHTML = '<i data-lucide="flame" class="w-3.5 h-3.5"></i><span>Halos de Demanda: ON</span>';
+      } else {
+        btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-950 text-slate-400 border border-slate-800 hover:text-white transition flex items-center gap-1.5';
+        btn.innerHTML = '<i data-lucide="flame" class="w-3.5 h-3.5"></i><span>Halos de Demanda: OFF</span>';
+      }
+      renderHeatmapBubbles();
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 4. ATUALIZAÇÃO DE TODOS OS DADOS QUANDO O USUÁRIO MUDA ANO, MÊS OU ESTAÇÃO
+    // =========================================================================
+    function handlePeriodFilterChange() {
+      const periodLabel = getSelectedPeriodLabel();
+      document.getElementById('map-corner-period').textContent = periodLabel.toUpperCase();
+
+      updateNetworkKPIs();
+      renderInteractiveMap();
+      selectStationOnMap(currentSelectedStationId);
+      renderTop10Ranking();
+    }
+
+    function updateNetworkKPIs() {
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+      const periodLabel = getSelectedPeriodLabel();
+
+      let totalL8 = 0;
+      let totalL9 = 0;
+      let revL8 = 0;
+      let revL9 = 0;
+
+      Object.values(stationsCatalog).forEach(st => {
+        const stats = getStationAnalytics(st.id, yearStr, monthVal);
+        if (st.lines.length === 2) {
+          // Divide proporcionalmente as estações compartilhadas (Osasco e Presidente Altino) entre L8 e L9
+          totalL8 += Math.round(stats.total * 0.52);
+          totalL9 += Math.round(stats.total * 0.48);
+          revL8 += Math.round(stats.grossRevenue * 0.52);
+          revL9 += Math.round(stats.grossRevenue * 0.48);
+        } else if (st.lines[0] === 'L8') {
+          totalL8 += stats.total;
+          revL8 += stats.grossRevenue;
+        } else {
+          totalL9 += stats.total;
+          revL9 += stats.grossRevenue;
+        }
+      });
+
+      const totalNetwork = totalL8 + totalL9;
+      const totalRevenue = revL8 + revL9;
+      const shareL8 = ((totalL8 / totalNetwork) * 100).toFixed(1).replace('.', ',');
+      const shareL9 = ((totalL9 / totalNetwork) * 100).toFixed(1).replace('.', ',');
+
+      document.getElementById('kpi-period-label').textContent = `Giro Total Rede (${periodLabel})`;
+      document.getElementById('kpi-total-network').textContent = formatNumberBR(totalNetwork);
+      document.getElementById('kpi-network-revenue').textContent = `Arrecadação Bruta: R$ ${formatNumberBR(totalRevenue)}`;
+
+      document.getElementById('kpi-total-l8').textContent = formatNumberBR(totalL8);
+      document.getElementById('kpi-total-l9').textContent = formatNumberBR(totalL9);
+
+      document.getElementById('kpi-share-l8').textContent = `R$ ${formatCompactBR(revL8)} • ${shareL8}% da rede`;
+      document.getElementById('kpi-share-l9').textContent = `R$ ${formatCompactBR(revL9)} • ${shareL9}% da rede`;
+    }
+
+    // Seleciona uma estação no mapa e exibe todos os indicadores de passageiros e arrecadação daquele Ano/Mês
+    function selectStationOnMap(stationId) {
+      const st = stationsCatalog[stationId];
+      if (!st) return;
+
+      currentSelectedStationId = stationId;
+
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+      const periodLabel = getSelectedPeriodLabel();
+
+      // Atualiza nós do SVG (incluindo anel de pulso na estação selecionada)
+      renderInteractiveMap();
+
+      // Calcula estatísticas da estação no período
+      const stats = getStationAnalytics(stationId, yearStr, monthVal);
+
+      // Calcula ranking da estação dentro de sua linha principal
+      const primaryLine = st.lines.includes('L9') && !st.lines.includes('L8') ? 'L9' : st.lines[0];
+      const peers = Object.values(stationsCatalog)
+        .filter(item => item.lines.includes(primaryLine))
+        .map(item => ({
+          id: item.id,
+          total: getStationAnalytics(item.id, yearStr, monthVal).total
+        }))
+        .sort((a, b) => b.total - a.total);
+
+      const rankPosition = peers.findIndex(p => p.id === stationId) + 1;
+      const lineTotalPax = peers.reduce((acc, cur) => acc + cur.total, 0);
+      const stationShareInLine = ((stats.total / lineTotalPax) * 100).toFixed(1).replace('.', ',');
+
+      // Cor de destaque da estação (#9E9E93 para L8 ou #00A88F para L9)
+      const stationThemeColor = primaryLine === 'L8' ? COLOR_L8_DIAMANTE : COLOR_L9_ESMERALDA;
+      document.getElementById('st-accent-bar').style.backgroundColor = stationThemeColor;
+
+      // Badges da Linha (Cor única oficial)
+      const badgesEl = document.getElementById('st-detail-badges');
+      badgesEl.innerHTML = st.lines.map(line => {
+        if (line === 'L8') {
+          return `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold text-slate-950" style="background-color: ${COLOR_L8_DIAMANTE};">LINHA 8 - DIAMANTE</span>`;
+        }
+        return `<span class="px-2.5 py-0.5 rounded-md text-[10px] font-extrabold text-slate-950" style="background-color: ${COLOR_L9_ESMERALDA};">LINHA 9 - ESMERALDA</span>`;
+      }).join('');
+
+      // Textos principais
+      document.getElementById('st-detail-name').textContent = st.name;
+      document.getElementById('st-detail-city').innerHTML = `
+        <i data-lucide="map-pin" class="w-3.5 h-3.5" style="color: ${stationThemeColor}"></i>
+        <span>Município: <strong>${st.city}</strong> • ${st.km}</span>
+      `;
+      document.getElementById('st-detail-rank').textContent = `#${rankPosition} na Linha ${primaryLine.replace('L', '')}`;
+
+      // Quantidade de Passageiros e Receita no Período Filtrado
+      document.getElementById('st-passengers-period-title').textContent = `Passageiros (Giro) • ${periodLabel}`;
+      document.getElementById('st-passengers-total').textContent = formatNumberBR(stats.total);
+      document.getElementById('st-revenue-total').textContent = `R$ ${formatNumberBR(stats.grossRevenue)}`;
+
+      const yoySign = stats.yoyPercent >= 0 ? '+' : '';
+      const yoyEl = document.getElementById('st-passengers-yoy');
+      yoyEl.textContent = `${yoySign}${stats.yoyPercent.toFixed(1).replace('.', ',')}% YoY`;
+
+      const lineFullName = primaryLine === 'L8' ? 'Linha 8 - Diamante' : 'Linha 9 - Esmeralda';
+      document.getElementById('st-passengers-share').innerHTML = `
+        Representa <strong class="text-white">${stationShareInLine}%</strong> de todo o fluxo de passageiros da <strong>${lineFullName}</strong>.
+      `;
+
+      // Sub-métricas (Média Dia Útil, Média Fim de Semana, Hora Pico)
+      document.getElementById('st-daily-avg').textContent = formatNumberBR(stats.dailyWeekday);
+      document.getElementById('st-paying-pax').textContent = formatNumberBR(stats.weekendAvg);
+      document.getElementById('st-peak-hour').textContent = `${formatNumberBR(stats.peakHour)}/h`;
+
+      // Atualiza também o KPI 4 no topo da página
+      document.getElementById('kpi-selected-station-name').textContent = `${st.name} (${st.lines.join('/')})`;
+      document.getElementById('kpi-selected-station-pax').textContent = `${formatNumberBR(stats.total)} giros • R$ ${formatCompactBR(stats.grossRevenue)}`;
+
+      // Verifica se existem dados de Meios de Pagamento e Parque de Bloqueios para a estação
+      const extraInfo = stationExtraArrecadacaoData[stationId] || null;
+      const hasChannelData = !!(extraInfo && extraInfo.channels);
+      const hasEquipmentData = !!(extraInfo && extraInfo.equipment);
+
+      // Badge de status de Meios de Pagamento
+      const paymentBadgeEl = document.getElementById('st-payment-status-badge');
+      if (hasChannelData) {
+        paymentBadgeEl.textContent = '• Dados Integrados';
+        paymentBadgeEl.className = 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+      } else {
+        paymentBadgeEl.textContent = '• Sem dados';
+        paymentBadgeEl.className = 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800';
+      }
+
+      // Renderiza o Mix de Canais de Arrecadação da Estação (Fica ZERADO caso não haja dados)
+      const channelsEl = document.getElementById('st-payment-channels');
+      const channelList = [
+        { key: 'topBU', label: 'Cartão TOP / Bilhete Único', color: stationThemeColor },
+        { key: 'qrCode', label: 'QR Code Digital / Carteiras', color: '#38bdf8' },
+        { key: 'nfc', label: 'Aproximação NFC (Débito/Crédito)', color: '#a855f7' },
+        { key: 'free', label: 'Gratuidades / Integração Livre', color: '#64748b' }
+      ];
+
+      channelsEl.innerHTML = channelList.map(ch => {
+        const paxVolume = hasChannelData ? (extraInfo.channels[ch.key] || 0) : 0;
+        const pct = (hasChannelData && stats.total > 0) ? ((paxVolume / stats.total) * 100) : 0;
+        const pctFormatted = pct.toFixed(1).replace('.', ',');
+
+        return `
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-300 font-medium">${ch.label}</span>
+              <span class="font-mono-tech ${hasChannelData ? 'text-slate-200' : 'text-slate-500'} font-bold">${formatNumberBR(paxVolume)} <span class="text-slate-500 font-normal">(${pctFormatted}%)</span></span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-300" style="width: ${pct.toFixed(1)}%; background-color: ${ch.color};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Badge e Grid do Parque de Equipamentos de Arrecadação (Fica ZERADO caso não haja dados)
+      const equipBadgeEl = document.getElementById('st-equipment-status-badge');
+      if (hasEquipmentData) {
+        equipBadgeEl.textContent = '• Online';
+        equipBadgeEl.className = 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+      } else {
+        equipBadgeEl.textContent = '• Sem dados';
+        equipBadgeEl.className = 'text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800';
+      }
+
+      const activeGates = hasEquipmentData ? extraInfo.equipment.activeGates : 0;
+      const totalGates = hasEquipmentData ? extraInfo.equipment.totalGates : 0;
+      const nfcGates = hasEquipmentData ? extraInfo.equipment.nfcGates : 0;
+      const totalATMs = hasEquipmentData ? extraInfo.equipment.atms : 0;
+
+      document.getElementById('st-equipment-grid').innerHTML = `
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-xl p-2">
+          <span class="text-[10px] text-slate-400 block">Bloqueios Ativos</span>
+          <strong class="text-xs sm:text-sm font-mono-tech font-extrabold ${hasEquipmentData ? 'text-white' : 'text-slate-500'}">${activeGates}/${totalGates}</strong>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-xl p-2">
+          <span class="text-[10px] text-slate-400 block">Catracas NFC</span>
+          <strong class="text-xs sm:text-sm font-mono-tech font-extrabold ${hasEquipmentData ? 'text-sky-400' : 'text-slate-500'}">${nfcGates} unid.</strong>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-xl p-2">
+          <span class="text-[10px] text-slate-400 block">ATMs Recarga</span>
+          <strong class="text-xs sm:text-sm font-mono-tech font-extrabold ${hasEquipmentData ? 'text-amber-300' : 'text-slate-500'}">${totalATMs} term.</strong>
+        </div>
+      `;
+
+      // Renderiza o gráfico de barras dos 12 meses do ano selecionado para a estação
+      renderStationMonthlyChart(stationId, yearStr, monthVal, stationThemeColor);
+
+      lucide.createIcons();
+    }
+
+    // Renderiza as 12 barras mensais da estação clicada
+    function renderStationMonthlyChart(stationId, yearStr, selectedMonthVal, barColor) {
+      const st = stationsCatalog[stationId];
+      document.getElementById('chart-station-title').textContent = `Fluxo Mensal • ${st.name}`;
+      document.getElementById('chart-year-badge').textContent = yearStr;
+
+      const monthlyValues = [];
+      let maxVal = 1;
+      for (let m = 0; m < 12; m++) {
+        const mStats = computeStationMonthPassengers(stationId, yearStr, m);
+        monthlyValues.push(mStats.total);
+        if (mStats.total > maxVal) maxVal = mStats.total;
+      }
+
+      const container = document.getElementById('monthly-chart-bars');
+      container.innerHTML = monthlyValues.map((val, idx) => {
+        const heightPct = Math.max(18, Math.round((val / maxVal) * 100));
+        const isCurrentSelectedMonth = selectedMonthVal !== 'all' && parseInt(selectedMonthVal) === idx;
+        const bgStyle = isCurrentSelectedMonth
+          ? 'background-color: #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.7);'
+          : `background-color: ${barColor}; opacity: ${selectedMonthVal === 'all' ? '0.85' : '0.4'};`;
+
+        return `
+          <div onclick="selectSpecificMonthFromChart(${idx})" class="flex flex-col items-center justify-end h-full cursor-pointer group" title="${monthNamesFull[idx]}/${yearStr}: ${formatNumberBR(val)} passageiros">
+            <span class="text-[9px] font-mono-tech text-slate-400 opacity-0 group-hover:opacity-100 transition mb-1">
+              ${formatCompactBR(val)}
+            </span>
+            <div class="w-full rounded-t-md transition-all group-hover:opacity-100" style="height: ${heightPct}%; ${bgStyle}"></div>
+            <span class="text-[9.5px] font-mono-tech mt-1.5 ${isCurrentSelectedMonth ? 'text-amber-300 font-extrabold' : 'text-slate-400'}">
+              ${monthNamesShort[idx]}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectSpecificMonthFromChart(monthIdx) {
+      document.getElementById('filter-month').value = String(monthIdx);
+      handlePeriodFilterChange();
+    }
+
+    // =========================================================================
+    // 5. TOP 10 ESTAÇÕES MAIS MOVIMENTADAS NO PERÍODO FILTRADO
+    // =========================================================================
+    function renderTop10Ranking() {
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+      const periodLabel = getSelectedPeriodLabel();
+
+      document.getElementById('ranking-period-subtitle').textContent = `Período: ${periodLabel} • Clique em uma estação para inspecionar`;
+
+      const filteredStations = Object.values(stationsCatalog).filter(st => {
+        if (currentMapFilter === 'L8') return st.lines.includes('L8');
+        if (currentMapFilter === 'L9') return st.lines.includes('L9');
+        if (currentMapFilter === 'transfer') return !!st.isTransfer;
+        return true;
+      });
+
+      const ranked = filteredStations
+        .map(st => ({
+          station: st,
+          stats: getStationAnalytics(st.id, yearStr, monthVal)
+        }))
+        .sort((a, b) => b.stats.total - a.stats.total)
+        .slice(0, 10);
+
+      const maxRankPax = ranked.length > 0 ? ranked[0].stats.total : 1;
+
+      const grid = document.getElementById('top-stations-grid');
+      grid.innerHTML = ranked.map((item, idx) => {
+        const st = item.station;
+        const isL9 = st.lines.includes('L9') && !st.lines.includes('L8');
+        const lineColor = isL9 ? COLOR_L9_ESMERALDA : COLOR_L8_DIAMANTE;
+        const pctWidth = Math.round((item.stats.total / maxRankPax) * 100);
+        const isSelected = st.id === currentSelectedStationId;
+
+        return `
+          <div onclick="selectStationOnMap('${st.id}')" 
+            class="bg-slate-950/90 border ${isSelected ? 'border-amber-400 ring-1 ring-amber-400/40' : 'border-slate-800/90 hover:border-slate-700'} rounded-xl p-3 cursor-pointer transition flex flex-col justify-between gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-mono-tech font-extrabold px-2 py-0.5 rounded bg-slate-900 text-amber-300 border border-slate-800">
+                #${idx + 1}
+              </span>
+              <span class="text-[10px] font-mono-tech font-extrabold px-2 py-0.5 rounded text-slate-950" style="background-color: ${lineColor};">
+                ${st.lines.join(' / ')}
+              </span>
+            </div>
+            <div>
+              <h4 class="text-sm font-extrabold text-white truncate">${st.name}</h4>
+              <p class="text-xs font-mono-tech font-bold text-slate-300 mt-0.5">
+                ${formatNumberBR(item.stats.total)} <span class="text-[10px] font-normal text-slate-500">giros</span>
+              </p>
+              <span class="text-[10px] font-mono-tech text-emerald-400 font-semibold block">
+                R$ ${formatCompactBR(item.stats.grossRevenue)}
+              </span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+              <div class="h-full rounded-full" style="width: ${pctWidth}%; background-color: ${lineColor};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 6. FILTROS DE LINHA E BUSCA RÁPIDA DE ESTAÇÃO
+    // =========================================================================
+    function setMapFilter(filterType) {
+      currentMapFilter = filterType;
+
+      ['all', 'L8', 'L9', 'transfer'].forEach(key => {
+        const btn = document.getElementById(`filter-${key}`);
+        if (btn) {
+          if (key === filterType) {
+            btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white transition flex items-center gap-1.5';
+          } else {
+            btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition flex items-center gap-1.5';
+          }
+        }
+      });
+
+      applyCurrentFilterClasses();
+      renderHeatmapBubbles();
+      renderTop10Ranking();
+    }
+
+    function applyCurrentFilterClasses() {
+      const line8El = document.getElementById('svg-line-L8');
+      const line9El = document.getElementById('svg-line-L9');
+
+      if (line8El) line8El.classList.toggle('dimmed', currentMapFilter === 'L9');
+      if (line9El) line9El.classList.toggle('dimmed', currentMapFilter === 'L8');
+
+      document.querySelectorAll('.station-node').forEach(node => {
+        const lines = node.getAttribute('data-lines') || '';
+        const isTransfer = node.getAttribute('data-transfer') === 'true';
+
+        let visible = true;
+        if (currentMapFilter === 'L8') visible = lines.includes('L8');
+        if (currentMapFilter === 'L9') visible = lines.includes('L9');
+        if (currentMapFilter === 'transfer') visible = isTransfer;
+
+        node.classList.toggle('dimmed', !visible);
+      });
+    }
+
+    function handleStationSearch(query) {
+      const clean = query.trim().toLowerCase();
+      if (!clean) {
+        applyCurrentFilterClasses();
+        return;
+      }
+
+      let firstMatchId = null;
+      document.querySelectorAll('.station-node').forEach(node => {
+        const stId = node.id.replace('st-node-', '');
+        const st = stationsCatalog[stId];
+        const match = st.name.toLowerCase().includes(clean) || st.city.toLowerCase().includes(clean);
+        node.classList.toggle('dimmed', !match);
+        if (match && !firstMatchId) firstMatchId = stId;
+      });
+
+      if (firstMatchId) {
+        selectStationOnMap(firstMatchId);
+      }
+    }
+
+    // =========================================================================
+    // 7. EXPORTAÇÃO CSV PARA A EQUIPE DE GESTÃO DE ARRECADAÇÃO
+    // =========================================================================
+    function exportArrecadacaoCSV() {
+      const yearStr = document.getElementById('filter-year').value;
+      const monthVal = document.getElementById('filter-month').value;
+      const periodLabel = getSelectedPeriodLabel();
+
+      const rows = [
+        ['Estacao', 'Linhas', 'Municipio', 'Periodo', 'Passageiros_Giro_Catraca', 'Media_Dia_Util', 'Pico_Horario', 'Receita_Bruta_Estimada_BRL', 'Cartao_TOP_BU', 'QR_Code', 'NFC', 'Gratuidades', 'Bloqueios_Ativos', 'Catracas_NFC', 'ATMs_Recarga']
+      ];
+
+      Object.values(stationsCatalog).forEach(st => {
+        const stats = getStationAnalytics(st.id, yearStr, monthVal);
+        const extra = stationExtraArrecadacaoData[st.id] || null;
+        rows.push([
+          `"${st.name}"`,
+          `"${st.lines.join('/')}"`,
+          `"${st.city}"`,
+          `"${periodLabel}"`,
+          stats.total,
+          stats.dailyWeekday,
+          stats.peakHour,
+          stats.grossRevenue,
+          extra && extra.channels ? extra.channels.topBU : 0,
+          extra && extra.channels ? extra.channels.qrCode : 0,
+          extra && extra.channels ? extra.channels.nfc : 0,
+          extra && extra.channels ? extra.channels.free : 0,
+          extra && extra.equipment ? `${extra.equipment.activeGates}/${extra.equipment.totalGates}` : '0/0',
+          extra && extra.equipment ? extra.equipment.nfcGates : 0,
+          extra && extra.equipment ? extra.equipment.atms : 0
+        ]);
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + rows.map(e => e.join(';')).join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `gestao_arrecadacao_L8_L9_${yearStr}_${monthVal}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // =========================================================================
+    // 8. CONTROLES DE ZOOM & PAN (ARRASTAR O MAPA)
+    // =========================================================================
+    function applyPanZoomTransform() {
+      const group = document.getElementById('svg-pan-zoom-group');
+      if (group) {
+        group.setAttribute('transform', `translate(${mapPanX}, ${mapPanY}) scale(${mapZoom})`);
+      }
+    }
+
+    function zoomMap(factor) {
+      const newZoom = Math.max(0.75, Math.min(2.6, mapZoom * factor));
+      mapZoom = newZoom;
+      applyPanZoomTransform();
+    }
+
+    function resetMapView() {
+      mapZoom = 1;
+      mapPanX = 0;
+      mapPanY = 0;
+      applyPanZoomTransform();
+    }
+
+    function setupMapPanAndZoom() {
+      const viewport = document.getElementById('map-viewport');
+      if (!viewport) return;
+
+      viewport.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.station-node')) return;
+        isDraggingMap = true;
+        dragStartX = e.clientX - mapPanX;
+        dragStartY = e.clientY - mapPanY;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDraggingMap) return;
+        mapPanX = e.clientX - dragStartX;
+        mapPanY = e.clientY - dragStartY;
+        applyPanZoomTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDraggingMap = false;
+      });
+
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.12 : 0.89;
+        zoomMap(factor);
+      }, { passive: false });
+    }
+
+    // =========================================================================
+    // INICIALIZAÇÃO GERAL
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      updateNetworkKPIs();
+      renderInteractiveMap();
+      selectStationOnMap('pinheiros');
+      renderTop10Ranking();
+      setupMapPanAndZoom();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
